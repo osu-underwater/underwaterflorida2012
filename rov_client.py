@@ -1,11 +1,19 @@
 import socket
+import ConfigParser
 
 class Connection:
 
-    def __init__(self, ip = '192.168.0.177', port = 23, timeout = 5):
-        self.ip         = ip
-        self.port       = port
-        self.timeout    = timeout
+    def __init__(self, ip = None, port = None, timeout = None):
+        self.config = ConfigParser.ConfigParser()
+        self.config.read("rov.cfg")
+
+        if not ip:
+            self.ip         = self.config.get("connection","ip")
+        if not port:
+            self.port       = self.config.getint("connection","port")
+        if not timeout:
+            self.timeout    = self.config.getint("connection","timeout")
+
         self.connected  = False
         self.sock2micro = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 

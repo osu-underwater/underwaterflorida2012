@@ -4,14 +4,17 @@ import ConfigParser
 class Connection:
 
     def __init__(self, ip = None, port = None, timeout = None):
+        self.ip         = ip
+        self.port       = port
+        self.timeout    = timeout
         self.config = ConfigParser.ConfigParser()
         self.config.read("rov.cfg")
 
-        if not ip:
+        if not self.ip:
             self.ip         = self.config.get("connection","ip")
-        if not port:
+        if not self.port:
             self.port       = self.config.getint("connection","port")
-        if not timeout:
+        if not self.timeout:
             self.timeout    = self.config.getint("connection","timeout")
 
         self.connected  = False

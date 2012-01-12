@@ -2,24 +2,18 @@ import socket
 import ConfigParser
 
 class Connection:
-    def __init__(self, ip = None, port = None, timeout = None):
+    def __init__(self, device="microcontroller", cfg="rov.cfg"):
         '''
         Initializes a Connection object using a TCP/IP socket.
         PARAMETERS: Custom values for ip address, port, and timeout.
             A config file is used where parameters are not given.
         '''
-        self.ip         = ip
-        self.port       = port
-        self.timeout    = timeout
         config = ConfigParser.ConfigParser()
-        config.read("rov.cfg")
+        config.read(cfg)
 
-        if not self.ip:
-            self.ip         = config.get("connection","ip")
-        if not self.port:
-            self.port       = config.getint("connection","port")
-        if not self.timeout:
-            self.timeout    = config.getint("connection","timeout")
+        self.ip         = config.get(device,"ip")
+        self.port       = config.getint(device,"port")
+        self.timeout    = config.getint(device,"timeout")
 
         self.connected  = False
         self.sock2micro = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

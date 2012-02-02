@@ -2,8 +2,7 @@ import ConfigParser
 import string
 
 class Thruster:
-    def __init__(self, device="rov.thruster0",
-            config=ConfigParser.ConfigParser()):
+    def __init__(self, device, config):
 
         self.config = config
 

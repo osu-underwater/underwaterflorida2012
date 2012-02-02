@@ -2,7 +2,7 @@ import socket
 import ConfigParser
 
 class Connection:
-    def __init__(self, device="microcontroller", cfg="rov.cfg"):
+    def __init__(self, device="microcontroller", cfg="settings.cfg"):
         '''
         Initializes a Connection object using a TCP/IP socket.
         PARAMETERS: Custom values for ip address, port, and timeout.

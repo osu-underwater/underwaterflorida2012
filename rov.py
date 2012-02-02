@@ -2,7 +2,7 @@ import ConfigParser
 import thruster
 
 class Rov:
-    def __init__(self, device="microcontroller", cfg="rov.cfg"):
+    def __init__(self, device="microcontroller", cfg="settings.cfg"):
 
         self.config = ConfigParser.ConfigParser()
         self.config.read(cfg)

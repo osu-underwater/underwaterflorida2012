@@ -18,6 +18,13 @@ class Rov:
             if t.orientation == orientation:
                 t.get_instructions(mode)
 
+    def go(self, parameters):
+        for t in self.thrusters:
+            t.go(parameters)
+
+    def report(self):
+        return [t.vector for t in self.thrusters]
+
     def __str__(self):
         s = ""
         for t in self.thrusters:

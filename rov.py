@@ -1,8 +1,9 @@
 import ConfigParser
 import thruster
+import connection
 
 class Rov:
-    def __init__(self, device="microcontroller", cfg="settings.cfg"):
+    def __init__(self, cfg="settings.cfg"):
 
         self.config = ConfigParser.ConfigParser()
         self.config.read(cfg)
@@ -11,8 +12,10 @@ class Rov:
             self.thrusters += \
                     [thruster.Thruster(device="rov.thruster%d" % i, config=self.config)]
         self.mode = ""
+        self.micro = connection.Connection()
 
     def mode_change(self, mode):
+        self.mode = mode
         orientation = self.config.get("mode.%s" % mode, "orientation")
         for t in self.thrusters:
             if t.orientation == orientation:

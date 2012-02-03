@@ -2,12 +2,13 @@ import socket
 import ConfigParser
 
 class Connection:
-    def __init__(self, device="microcontroller", cfg="settings.cfg"):
+    def __init__(self, device="microcontroller", cfg="settings.cfg", verbose=True):
         '''
         Initializes a Connection object using a TCP/IP socket.
         PARAMETERS: Custom values for ip address, port, and timeout.
             A config file is used where parameters are not given.
         '''
+        self.verbose = verbose
         config = ConfigParser.ConfigParser()
         config.read(cfg)
 
@@ -24,16 +25,16 @@ class Connection:
         Establishes the connection to the configured IP.
         '''
         try:
-            print "Connecting to microcontroller."
+            self.log("Connecting to microcontroller.")
             self.close()
             self.sock2micro = socket.socket(socket.AF_INET, \
                                             socket.SOCK_STREAM)
             self.sock2micro.settimeout(self.timeout)
             self.sock2micro.connect((self.ip, self.port))
-            print "Connected successfully."
+            self.log("Connected successfully.")
             self.connected = True
-        except Exception, e:
-            print "%s error" % e
+        except socket.error, e:
+            self.log("%s error" % e)
             self.connected = False
 
     def close(self):
@@ -42,6 +43,7 @@ class Connection:
         '''
         self.sock2micro.close()
         self.connected = False
+        self.log("Connection closed.")
 
     def send(self, data):
         '''
@@ -51,8 +53,8 @@ class Connection:
         if self.connected:
             try:
                 self.sock2micro.send(data)
-            except Exception, e:
-                print '%s error sending "%s"' % (e, data)
+            except socket.error, e:
+                self.log('%s error sending "%s"' % (e, data))
                 self.connected = False
 
     def recv(self, length = 1024):
@@ -65,10 +67,14 @@ class Connection:
             try:
                 received = self.sock2micro.recv(length)
                 return received
-            except Exception, e:
-                print '%s error receiving %d bytes' % (e, length)
+            except socket.error, e:
+                self.log('%s error receiving %d bytes' % (e, length))
                 self.connected = False
         return None
+
+    def log(self, msg):
+        if self.verbose:
+            print msg
 
 
 if __name__ == "__main__":

@@ -45,4 +45,5 @@ if __name__ == "__main__":
         print
         time.sleep(0.1)
 
-
+    gamepad.quit()
+    pygame.quit()

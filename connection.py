@@ -25,8 +25,9 @@ class Connection:
         Establishes the connection to the configured IP.
         '''
         try:
-            self.log("Connecting to microcontroller.")
             self.close()
+            self.log("Connecting to microcontroller at %s:%s." % \
+                    (self.ip, self.port))
             self.sock2micro = socket.socket(socket.AF_INET, \
                                             socket.SOCK_STREAM)
             self.sock2micro.settimeout(self.timeout)

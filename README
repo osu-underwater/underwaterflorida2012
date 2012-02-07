@@ -1,1 +1,8 @@
 Check out our website here: https://sites.google.com/site/orstrov/home
+
+Useful tips for setting up the gateway:
+ifconfig eth0 up
+vim /etc/network/interfaces
+/etc/init.d/networking restart
+route add -host <address>
+route add default gw <address>

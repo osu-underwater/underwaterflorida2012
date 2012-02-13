@@ -13,6 +13,7 @@ class Rov:
                     [thruster.Thruster(device="rov.thruster%d" % i, config=self.config)]
         self.mode = ""
         self.micro = connection.Connection()
+        self.micro.connect()
 
     def mode_change(self, mode):
         self.mode = mode
@@ -28,6 +29,14 @@ class Rov:
     def report(self):
         return [t.vector for t in self.thrusters]
 
+    def command(self):
+        data = []
+        for t in self.thrusters:
+            data += [abs(t.vector)]
+        #data += "\0"
+        data = bytearray(data)
+        self.micro.send(data)
+
     def __str__(self):
         s = ""
         for t in self.thrusters:
@@ -36,6 +45,7 @@ class Rov:
 
 if __name__ == "__main__":
     r = Rov()
-    r.mode_change("pitch")
-    r.mode_change("stdhorizontal")
-    print r
+    #r.mode_change("pitch")
+    #r.mode_change("stdhorizontal")
+    #print r
+    r.command()

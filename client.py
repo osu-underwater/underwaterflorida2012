@@ -32,17 +32,20 @@ if __name__ == "__main__":
     r.mode_change("pitch")
     r.mode_change("stdhorizontal")
     while True:
-        subprocess.call("clear")
         pygame.event.pump()
         parameters = {'xh': gamepad.get_axis(0) * 100, \
                 'yh': gamepad.get_axis(1) * -100, \
                 'xv': gamepad.get_axis(3) * 100, \
                 'yv': gamepad.get_axis(2) * -100}
         r.go(parameters)
+        r.command()
+        '''
+        subprocess.call("clear")
         print
         for v in r.report():
             print starbar(v)
         print
+        '''
         time.sleep(0.1)
 
     gamepad.quit()

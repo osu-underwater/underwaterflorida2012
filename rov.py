@@ -11,6 +11,7 @@ class Rov:
         for i in range(self.config.getint('rov', 'thrusters')):
             self.thrusters += \
                     [thruster.Thruster(device="rov.thruster%d" % i, config=self.config)]
+        self.pwm_cap = self.config.getfloat('rov', 'pwm_cap')
         self.mode = ""
         self.micro = connection.Connection()
         self.micro.connect()
@@ -30,10 +31,15 @@ class Rov:
         return [t.vector for t in self.thrusters]
 
     def command(self):
+        """
+        'a' - Analog write (2 operands: pin, value)
+        'd' - Digital write (2 operands: pin, high/low)
+        """
         data = []
         for t in self.thrusters:
-            data += [abs(t.vector)]
-        #data += "\0"
+            data += ['a', t.magnitude, int(min(abs(t.vector)*255, 255*self.pwm_cap))]
+            data += ['d', t.forward, 'H' if t.vector >= 0 else 'L']
+            data += ['d', t.reverse, 'H' if t.vector <  0 else 'L']
         data = bytearray(data)
         self.micro.send(data)
 
@@ -45,7 +51,4 @@ class Rov:
 
 if __name__ == "__main__":
     r = Rov()
-    #r.mode_change("pitch")
-    #r.mode_change("stdhorizontal")
-    #print r
     r.command()

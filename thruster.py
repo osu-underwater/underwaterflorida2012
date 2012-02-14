@@ -3,12 +3,13 @@ import string
 
 
 class Thruster:
-    max_input = 100
+    max_input = None
 
     def __init__(self, device, config):
 
         self.config         = config
-        Thruster.max_input  = self.config.getint("controls", "max_input")
+        if not Thruster.max_input:
+            Thruster.max_input = self.config.getint("controls", "max_input")
 
         self.mount          = self.config.get(device, "mount").split()
         self.orientation    = self.config.get(device, "orientation")
@@ -18,7 +19,7 @@ class Thruster:
 
         self.vector         = 0
         self.instructions   = []
-        self.max_power      = 100
+        self.max_power      = 1
 
     def go(self, parameters):
         instack = [0]
@@ -34,12 +35,18 @@ class Thruster:
                 instack.append(parameters[inst])
                 if inst not in powval:
                     powval[inst] = parameters[inst]
-        powval = min(sum([powval[i]**2 for i in powval])**0.5, self.max_power)
         modifier = instack.pop()
+        powval = min((sum([powval[i]**2 for i in powval])**0.5 / Thruster.max_input), 1)
+        powval = powval * min(abs(modifier/Thruster.max_input), 1)
         powval = powval * (-1 if modifier < 0 else 1)
-        self.vector = int(powval * min(abs(modifier/Thruster.max_input), 1))
+        powval = powval * self.max_power
+        self.vector = powval
 
     def get_instructions(self, mode):
+        if self.config.has_option("mode.%s" % mode, "max_power"):
+            self.max_power = self.config.getfloat("mode.%s" % mode, "max_power")
+        else:
+            self.max_power = 1.0
         options = self.config.options("mode.%s" % mode)
         bestoption = None
         for option in options:

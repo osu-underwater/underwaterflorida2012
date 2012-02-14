@@ -11,9 +11,11 @@ IPAddress subnet(255,255,255,0);
 EthernetServer server(23);
 EthernetClient client = 0;
 
+int pin, val;
+
 void setup(){
     Serial.begin(9600);
-    Ethernet.begin(mac,ip,gateway, subnet);
+    Ethernet.begin(mac, ip, gateway, subnet);
     server.begin();
     client = server.available();
     Serial.println("Setup complete.");
@@ -29,7 +31,22 @@ void test_comm(){
     if (client.connected()){
         if(client.available()){
             mybyte = client.read();
-            Serial.print(mybyte);
+            if (mybyte == 'a'){
+                pin = client.read();
+                val = client.read();
+                analogWrite(pin, val);
+            } else if (mybyte == 'd'){
+                pin = client.read();
+                val = client.read();
+                if (val == 'H'){
+                    digitalWrite(pin, HIGH);
+                } else if (val == 'L'){
+                    digitalWrite(pin, LOW);
+                }
+            } else {
+              Serial.print("Unknown opcode: ");
+              Serial.println(char(mybyte));
+            }
         }
     }
 }

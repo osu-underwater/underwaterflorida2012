@@ -1,52 +1,46 @@
-//header files for TCP/IP
-#include <SPI.h>
-#include <Ethernet.h>
+/*! \file micro.ino
+ *  \author Nathan Murrow, Soo-Hyun Yoo
+ *  \brief ROV main controller loop.
+ */
 
-//network info
-byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
-IPAddress ip(192,169,0,177);
-IPAddress gateway(192,169,0,1);
-IPAddress subnet(255,255,255,0);
+#include "ethcomm.h"
 
-EthernetServer server(23);
-EthernetClient client = 0;
+int main(void) {
+    init();   // For Arduino.
 
-int pin, val;
+    Serial.begin(115200);
 
-void setup(){
-    Serial.begin(9600);
-    Ethernet.begin(mac, ip, gateway, subnet);
-    server.begin();
-    client = server.available();
+
+    int pin, val;
+
     Serial.println("Setup complete.");
-}
 
-void loop(){
-    test_comm();
-}
-
-void test_comm(){
     uint8_t mybyte;
-    EthernetClient client = server.available();
-    if (client.connected()){
-        if(client.available()){
-            mybyte = client.read();
-            if (mybyte == 'a'){
-                pin = client.read();
-                val = client.read();
-                analogWrite(pin, val);
-            } else if (mybyte == 'd'){
-                pin = client.read();
-                val = client.read();
-                if (val == 'H'){
-                    digitalWrite(pin, HIGH);
-                } else if (val == 'L'){
-                    digitalWrite(pin, LOW);
+
+    while (1) {
+        if (client.connected()){
+            if(client.available()){
+                mybyte = client.read();
+                if (mybyte == 'a'){
+                    pin = client.read();
+                    val = client.read();
+                    analogWrite(pin, val);
+                } else if (mybyte == 'd'){
+                    pin = client.read();
+                    val = client.read();
+                    if (val == 'H'){
+                        digitalWrite(pin, HIGH);
+                    } else if (val == 'L'){
+                        digitalWrite(pin, LOW);
+                    }
+                } else {
+                  Serial.print("Unknown opcode: ");
+                  Serial.println(char(mybyte));
                 }
-            } else {
-              Serial.print("Unknown opcode: ");
-              Serial.println(char(mybyte));
             }
         }
     }
+
+    return 0;
 }
+

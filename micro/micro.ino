@@ -6,6 +6,7 @@
 #include <Wire.h>
 #include "ethcomm.cpp"
 #include "imu.cpp"
+#include "telemetry.h"
 
 int main(void) {
     init();   // For Arduino.
@@ -44,6 +45,7 @@ int main(void) {
             // Telemetry loop
             // ================================================================
             if (loopCount % TELEMETRY_LOOP_INTERVAL == 0) {
+                sendTelemetry(nextRunTime);
                 //eth.test();
             }
 

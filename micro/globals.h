@@ -12,6 +12,7 @@
 // Variables
 // ============================================================================
 int loopCount;   // Count system loops.
+float pwmOut[4];
 float bodyDCM[3][3];   // Current body orientation calculated by IMU.
 float targetRot[3], currentRot[3], pidRot[3];
 
@@ -60,10 +61,10 @@ struct PIDdata {
 // ============================================================================
 // SERIAL OUT
 // ============================================================================
-#define SEND_TARGET_ROTATION
-#define SEND_MOTOR_VALUES
+//#define SEND_TARGET_ROTATION
+//#define SEND_MOTOR_VALUES
 #define SEND_DCM
-#define SEND_PID
+//#define SEND_PID
 
 #define DCM_SER_TAG 0xfb
 #define ROT_SER_TAG 0xfc

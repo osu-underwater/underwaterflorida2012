@@ -13,14 +13,6 @@
 
 //#define ENABLE_GYRO_RK_SMOOTH   // Enable Runge-Kutta smoothing (low-pass filter)
 
-#define READ_SIZE 6   // Number of bytes to read each time
-#define REGADDR 0x1D
-
-// Calibration values
-#define GXOFFSET 0//55
-#define GYOFFSET 0//168
-#define GZOFFSET 0//92
-
 // ITG-3200 address defines
 #define GYRADDR 0x69 // gyro address, binary = 11101001
 #define SMPLRT_DIV 0x15
@@ -43,10 +35,11 @@
 
 
 class ITG3200 {
-    byte gBuffer[10];   // Buffer for general use. Increase size as needed.
+    uint8_t buffer[6];   // Buffer for general use. Increase size as needed.
     char gStr[512];
 
     uint16_t gRaw[3];   // Raw bits received from ITG-3200
+    float gVec[3];   // [-2000, 2000] deg/s mapped to [-1, 1].
     bool calibrated;   // Disable integration until calibration finishes.
     float tempData[3];   // Temporary storage of calibration data
     float gZero[3];   // Zero values
@@ -59,11 +52,9 @@ class ITG3200 {
 public:
     ITG3200();
     void calibrate(int);
-    void poll();   // Get bits from ITG-3200 and update gVal[].
-    float* getRate();
-    float getRate(int);
-    float* getAngle();
-    float getAngle(int);
+    void poll();   // Get bits from ITG-3200 and update gVec[].
+    float* get();
+    float get(int);
 };
 
 #endif // ITG3200_H

@@ -9,7 +9,7 @@
 #define HMC5883_H
 
 #include "i2c.h"
-#include "triMath.h"
+#include "rov_math.h"
 #include "globals.h"
 
 #define MAG_ADDRESS 0x1e

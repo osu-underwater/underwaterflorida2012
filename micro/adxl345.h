@@ -13,11 +13,10 @@
 
 //#define ENABLE_ACC_RK_SMOOTH   // Enable Runge-Kutta smoothing (low-pass filter)
 
-#define ACC_ADDR 0xe5   // ADXL345 device address.
+#define ACC_ADDR 0x53   // ADXL345 device address.
 
 class ADXL345 {
     uint8_t buffer[6];   // Buffer to which we save data read from device
-    char aStr[512];   // String buffer to organize data before sending to serial line
     uint16_t aRaw[3];   // Raw digital values.
     float aVec[3];   // In g's
     float temp;   // Temperature.

@@ -13,6 +13,9 @@ ADXL345::ADXL345(uint8_t range, uint8_t bw) {
     sp("ADXL345 ID = ");
     spln((int) buffer[0]);
 
+    // Set POWER_CTL to 'measure' to turn it on.
+    sendI2C(ACC_ADDR, 0x2d, 0x08);
+
     // Set range (DS p. 17).
     // Resolution: 256 LSB/g if FULL_RES is set.
     //     range  +/- g range

@@ -71,6 +71,14 @@ void ITG3200::poll() {
     gRaw[0] = ((buffer[2] << 8) | buffer[3]);   // Tricopter X axis is chip Y axis. Must be negated later!
     gRaw[2] = ((buffer[4] << 8) | buffer[5]);   // Z axis is same.
 
+    sp("G( ");
+    for (int i=0; i<3; i++) {
+        sp(gRaw[i]);
+        sp(" ");
+    }
+    spln(")");
+
+
     // Read gyro temperature.
     //readI2C(GYRADDR, TEMP_OUT, 2, buffer);
     //temp = 35 + (((buffer[0] << 8) | buffer[1]) + 13200)/280.0;

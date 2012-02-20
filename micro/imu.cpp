@@ -22,7 +22,7 @@
 
 #include "imu.h"
 
-IMU::IMU() : acc(4, 5),   // range, bandwidth: DS p. 27
+IMU::IMU() : acc(3, 11),   // range, bandwidth
              gyro()
 {}
 

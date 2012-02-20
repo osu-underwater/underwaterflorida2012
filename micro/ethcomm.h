@@ -10,17 +10,15 @@
 #include <Ethernet.h>
 
 class EthComm {
-    // Network information.
-    uint8_t mac[6];
-    uint8_t ip[4];
-    uint8_t gateway[4];
-    uint8_t subnet[4];
+    int pin, val;
+    uint8_t myByte;
 
-    EthernetServer server;
-    EthernetClient client;
+    Server server;
+    Client client;
 
 public:
     EthComm();
+    void test();
 };
 
 #endif // ETHCOMM_H

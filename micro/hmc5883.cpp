@@ -21,12 +21,12 @@ void HMC5883::poll() {
     mRaw[1] = ((buffer[2] << 8) | buffer[3]);   // Y
     mRaw[2] = ((buffer[4] << 8) | buffer[5]);   // Z
 
-    sp("M( ");
-    for (int i=0; i<3; i++) {
-        sp(mRaw[i]);
-        sp(" ");
-    }
-    sp(")   ");
+    //sp("M( ");
+    //for (int i=0; i<3; i++) {
+    //    sp(mRaw[i]);
+    //    sp(" ");
+    //}
+    //spln(")   ");
 
     // Convert raw outputs to vector values.
     // Output: [0xf800 -- 0xffff] = [-2048 --   -1]

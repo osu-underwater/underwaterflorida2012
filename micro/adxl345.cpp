@@ -65,32 +65,31 @@ void ADXL345::poll() {
     // Read data.
     readI2C(ACC_ADDR, 0x32, 6, buffer);
 
-    aRaw[0] = ((buffer[3] << 8) | buffer[2]);   // ROV X axis is negative chip Y axis. Must be negated later!
-    aRaw[1] = ((buffer[1] << 8) | buffer[0]);   // ROV Y axis is negative chip X axis. Must be negated later!
-    aRaw[2] = ((buffer[5] << 8) | buffer[4]);   // Z axis is the same.
+    aRaw[0] = (buffer[3] << 8) | buffer[2];   // ROV X axis is negative chip Y axis.
+    aRaw[1] = (buffer[1] << 8) | buffer[0];   // ROV Y axis is negative chip X axis.
+    aRaw[2] = (buffer[5] << 8) | buffer[4];   // Z axis is the same.
 
-    sp("A( ");
-    for (int i=0; i<3; i++) {
-        sp((int) aRaw[i]);
-        sp(" ");
-    }
-    sp(")   ");
+    //sp("A( ");
+    //for (int i=0; i<3; i++) {
+    //    sp(aRaw[i]);
+    //    sp(" ");
+    //}
+    //sp(")   ");
 
     // Convert raw values to multiples of gravitational acceleration.
-    // Output: [0x1fff -- 0x0000] = [-8191 --    0]
-    //         [0x3fff -- 0x2000] = [    1 -- 8192]
     // ADC resolution: 256 LSB/g.
     for (int i=0; i<3; i++) {
-        float tmp;
-
-        if (aRaw[i] < 0x2000)
-            tmp = -((signed) aRaw[i]);
-        else
-            tmp = 0x4000 - aRaw[i];
-
-        aVec[i] = tmp / 256;
+        aVec[i] = (float) ((int) aRaw[i]) / 256;
     }
-    aVec[0] *= -1;   // Negated.
+    aVec[0] *= -1;
+    aVec[2] *= -1;
+
+    //sp("A( ");
+    //for (int i=0; i<3; i++) {
+    //    sp(aVec[i]);
+    //    sp(" ");
+    //}
+    //sp(")   ");
 
     // Runge-Kutta smoothing.
     #ifdef ENABLE_ACC_RK_SMOOTH

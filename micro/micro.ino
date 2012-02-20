@@ -10,12 +10,12 @@ int main(void) {
 
     Serial.begin(115200);
 
-    EthComm eth;
+    //EthComm eth;
 
     Serial.println("Setup complete.");
 
     while (1) {
-        eth.test();
+        //eth.test();
     }
 
     return 0;

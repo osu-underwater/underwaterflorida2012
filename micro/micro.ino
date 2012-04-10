@@ -3,7 +3,7 @@
  *  \brief ROV main controller loop.
  */
 
-#include <Wire.h>
+//#include <Wire.h>
 #include "ethcomm.cpp"
 #include "imu.cpp"
 #include "telemetry.h"

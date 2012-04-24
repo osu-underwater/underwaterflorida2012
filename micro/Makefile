@@ -36,7 +36,7 @@
 
 TARGET = rov_controller
 INSTALL_DIR = $(HOME)/apps/arduino-0023
-LIBRARY_INCLUDES = libraries.in
+#LIBRARY_INCLUDES = libraries.in
 PORT = /dev/ttyACM0
 UPLOAD_RATE = 115200
 AVRDUDE_PROGRAMMER = stk500
@@ -45,9 +45,35 @@ F_CPU = 16000000
 
 VERSION=23
 ARDUINO = $(INSTALL_DIR)/hardware/arduino/cores/arduino
-# ARDUINO_LIBS = $(INSTALL_DIR)/libraries/{ArduinoTestSuite,EEPROM,Ethernet,Firmata,LiquidCrystal,Matrix,SD,Servo,SoftwareSerial,SPI,Sprite,Stepper,Wire}
+ARDUINO_LIBS = $(INSTALL_DIR)/libraries/{ArduinoTestSuite,EEPROM,Ethernet,Firmata,LiquidCrystal,Matrix,SD,Servo,SoftwareSerial,SPI,Sprite,Stepper,Wire}
 
-ARDUINO_LIBS2 = -I$(INSTALL_DIR)/libraries/ArduinoTestSuite -I$(INSTALL_DIR)/libraries/ArduinoTestSuite/utility -I$(INSTALL_DIR)/libraries/EEPROM -I$(INSTALL_DIR)/libraries/EEPROM/utility -I$(INSTALL_DIR)/libraries/Ethernet -I$(INSTALL_DIR)/libraries/Ethernet/utility -I$(INSTALL_DIR)/libraries/Firmata -I$(INSTALL_DIR)/libraries/Firmate/utility -I$(INSTALL_DIR)/libraries/LiquidCrystal -I$(INSTALL_DIR)/libraries/LiquidCrystal/utility -I$(INSTALL_DIR)/libraries/Matrix -I$(INSTALL_DIR)/libraries/Matrix/utility -I$(INSTALL_DIR)/libraries/SD -I$(INSTALL_DIR)/libraries/SD/utility -I$(INSTALL_DIR)/libraries/Servo -I$(INSTALL_DIR)/libraries/Servo/utility -I$(INSTALL_DIR)/libraries/SoftwareSerial -I$(INSTALL_DIR)/libraries/SoftwareSerial/utility -I$(INSTALL_DIR)/libraries/SPI -I$(INSTALL_DIR)/libraries/SPI/utility -I$(INSTALL_DIR)/libraries/Sprite -I$(INSTALL_DIR)/libraries/Sprite/utility -I$(INSTALL_DIR)/libraries/Stepper -I$(INSTALL_DIR)/libraries/Stepper/utility -I$(INSTALL_DIR)/libraries/Wire -I$(INSTALL_DIR)/libraries/Wire/utility
+ARDUINO_LIBS2 = \
+-I$(INSTALL_DIR)/libraries/ArduinoTestSuite \
+-I$(INSTALL_DIR)/libraries/ArduinoTestSuite/utility \
+-I$(INSTALL_DIR)/libraries/EEPROM \
+-I$(INSTALL_DIR)/libraries/EEPROM/utility \
+-I$(INSTALL_DIR)/libraries/Ethernet \
+-I$(INSTALL_DIR)/libraries/Ethernet/utility \
+-I$(INSTALL_DIR)/libraries/Firmata \
+-I$(INSTALL_DIR)/libraries/Firmate/utility \
+-I$(INSTALL_DIR)/libraries/LiquidCrystal \
+-I$(INSTALL_DIR)/libraries/LiquidCrystal/utility \
+-I$(INSTALL_DIR)/libraries/Matrix \
+-I$(INSTALL_DIR)/libraries/Matrix/utility \
+-I$(INSTALL_DIR)/libraries/SD \
+-I$(INSTALL_DIR)/libraries/SD/utility \
+-I$(INSTALL_DIR)/libraries/Servo \
+-I$(INSTALL_DIR)/libraries/Servo/utility \
+-I$(INSTALL_DIR)/libraries/SoftwareSerial \
+-I$(INSTALL_DIR)/libraries/SoftwareSerial/utility \
+-I$(INSTALL_DIR)/libraries/SPI \
+-I$(INSTALL_DIR)/libraries/SPI/utility \
+-I$(INSTALL_DIR)/libraries/Sprite \
+-I$(INSTALL_DIR)/libraries/Sprite/utility \
+-I$(INSTALL_DIR)/libraries/Stepper \
+-I$(INSTALL_DIR)/libraries/Stepper/utility \
+-I$(INSTALL_DIR)/libraries/Wire \
+-I$(INSTALL_DIR)/libraries/Wire/utility
 
 #AVR_TOOLS_PATH = $(INSTALL_DIR)/hardware/tools/avr/bin
 AVR_TOOLS_PATH = /usr/bin
@@ -91,13 +117,13 @@ DEBUG =
 OPT = s
 
 # Place -D or -U options here
-CDEFS = -DF_CPU=$(F_CPU)L -DARDUINO=$(VERSION)
+CDEFS   = -DF_CPU=$(F_CPU)L -DARDUINO=$(VERSION)
 CXXDEFS = -DF_CPU=$(F_CPU)L -DARDUINO=$(VERSION)
 
 # Place -I options here
-CINCS = -I$(ARDUINO) -I$(ARDUINO_LIBS) -I`pwd`
-# CXXINCS = -I$(ARDUINO) -I$(ARDUINO_LIBS) -I`pwd`
-CXXINCS = -I$(ARDUINO) -I`pwd` $(ARDUINO_LIBS2)
+CINCS   = -I$(ARDUINO) -I$(ARDUINO_LIBS) -I`pwd`
+CXXINCS = -I$(ARDUINO) -I$(ARDUINO_LIBS) -I`pwd`
+#CXXINCS = -I$(ARDUINO) -I`pwd` $(ARDUINO_LIBS2)
 
 # Compiler flag to set the C Standard level.
 # c89   - "ANSI" C
@@ -173,7 +199,8 @@ applet/$(TARGET).cpp: $(TARGET).cpp
 # refer to this new, automatically generated, file.
 # Not the original .pde file you actually edit...
 	test -d applet || mkdir applet
-	cat $(LIBRARY_INCLUDES) > applet/$(TARGET).cpp
+	echo -ne '#include "WProgram.h"\n#include "EEPROM.cpp"\n#include "Ethernet.cpp"\n#include "LiquidCrystal.cpp"\n#include "Matrix.cpp"\n#include "Servo.cpp"\n#include "SoftwareSerial.cpp"\n#include "Sprite.cpp"\n#include "Stepper.cpp"\n#include "Wire.cpp"\n\n' > applet/$(TARGET).cpp
+#	cat $(LIBRARY_INCLUDES) > applet/$(TARGET).cpp
 #	echo 'void setup();' >> applet/$(TARGET).cpp
 #	echo 'void loop();' >> applet/$(TARGET).cpp
 	cat $(TARGET).cpp >> applet/$(TARGET).cpp

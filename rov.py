@@ -34,12 +34,16 @@ class Rov:
         """
         'a' - Analog write (2 operands: pin, value)
         'd' - Digital write (2 operands: pin, high/low)
+        's' - Servo write (2 operands: pin, angle [0-180])
         """
         data = []
         for t in self.thrusters:
-            data += ['a', t.magnitude, int(min(abs(t.vector)*255, 255*self.pwm_cap))]
-            data += ['d', t.forward, 'H' if t.vector >= 0 else 'L']
-            data += ['d', t.reverse, 'H' if t.vector <  0 else 'L']
+            if t.servo:
+                data += ['s', t.magnitude, int(max( (t.vector+1)*90, 0 ))]
+            else:
+                data += ['a', t.magnitude, int(min(abs(t.vector)*255, 255*self.pwm_cap))]
+                data += ['d', t.forward, 'H' if t.vector >= 0 else 'L']
+                data += ['d', t.reverse, 'H' if t.vector <  0 else 'L']
         data = bytearray(data)
         self.micro.send(data)
 

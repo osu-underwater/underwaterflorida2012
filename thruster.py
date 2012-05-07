@@ -16,6 +16,10 @@ class Thruster:
         self.forward        = self.config.getint(device, "forward")
         self.reverse        = self.config.getint(device, "reverse")
         self.magnitude      = self.config.getint(device, "magnitude")
+        if self.config.has_option(device, 'servo'):
+            self.servo = self.config.getboolean(device, 'servo')
+        else:
+            self.servo = False
 
         self.vector         = 0
         self.instructions   = []

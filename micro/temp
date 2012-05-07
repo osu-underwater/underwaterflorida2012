@@ -1,1 +1,0 @@
-echo -ne '#include "WProgram.h"\n#include "EEPROM.cpp"\n#include "Ethernet.cpp"\n#include "LiquidCrystal.cpp"\n#include "Matrix.cpp"\n#include "Servo.cpp"\n#include "SoftwareSerial.cpp"\n#include "Sprite.cpp"\n#include "Stepper.cpp"\n#include "Wire.cpp"\n\n' > libraries.in

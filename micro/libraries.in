@@ -1,0 +1,11 @@
+#include "WProgram.h"
+#include "EEPROM.cpp"
+#include "Ethernet.cpp"
+#include "LiquidCrystal.cpp"
+#include "Matrix.cpp"
+#include "Servo.cpp"
+#include "SoftwareSerial.cpp"
+#include "Sprite.cpp"
+#include "Stepper.cpp"
+#include "Wire.cpp"
+

@@ -95,6 +95,14 @@ $(ARDUINO)/main.cpp \
 $(ARDUINO)/WMath.cpp \
 $(ARDUINO)/Print.cpp \
 $(ARDUINO)/HardwareSerial.cpp \
+$(INSTALL_DIR)/libraries/EEPROM/EEPROM.cpp \
+$(INSTALL_DIR)/libraries/Ethernet/Ethernet.cpp \
+$(INSTALL_DIR)/libraries/Ethernet/Client.cpp \
+$(INSTALL_DIR)/libraries/Ethernet/Server.cpp \
+$(INSTALL_DIR)/libraries/Ethernet/Udp.cpp \
+$(INSTALL_DIR)/libraries/Ethernet/utility/w5100.cpp \
+$(INSTALL_DIR)/libraries/Ethernet/utility/socket.cpp \
+$(INSTALL_DIR)/libraries/SPI/SPI.cpp \
 #$(ARDUINO)/WString.cpp \
 # end of CXX_MODULES
 
@@ -199,7 +207,7 @@ applet/$(TARGET).cpp: $(TARGET).cpp
 # refer to this new, automatically generated, file.
 # Not the original .pde file you actually edit...
 	test -d applet || mkdir applet
-	echo -ne '#include "WProgram.h"\n#include "EEPROM.cpp"\n#include "Ethernet.cpp"\n#include "LiquidCrystal.cpp"\n#include "Matrix.cpp"\n#include "Servo.cpp"\n#include "SoftwareSerial.cpp"\n#include "Sprite.cpp"\n#include "Stepper.cpp"\n#include "Wire.cpp"\n\n' > applet/$(TARGET).cpp
+	#echo -ne '#include "WProgram.h"\n#include "EEPROM.cpp"\n#include "Ethernet.cpp"\n#include "LiquidCrystal.cpp"\n#include "Matrix.cpp"\n#include "Servo.cpp"\n#include "SoftwareSerial.cpp"\n#include "Sprite.cpp"\n#include "Stepper.cpp"\n#include "Wire.cpp"\n\n' > applet/$(TARGET).cpp
 	cat $(LIBRARY_INCLUDES) > applet/$(TARGET).cpp
 #	echo 'void setup();' >> applet/$(TARGET).cpp
 #	echo 'void loop();' >> applet/$(TARGET).cpp

@@ -1,5 +1,9 @@
 Check out our website here: https://sites.google.com/site/orstrov/home
 
-04/09/12
+
+
+== Changes to Arduino library 0023 ==
 -Commented out #define round(x) in wiring_private.h and wiring.h
 -Changed include of Wire.cpp to "utility/twi.c"
+-Added line "Client::Client() : _sock(MAX_SOCK_NUM) {} to Client.cpp.
+

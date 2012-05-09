@@ -39,11 +39,15 @@ class Rov:
         data = []
         for t in self.thrusters:
             if t.servo:
-                data += ['s', t.magnitude, int(max( (t.vector+1)*90, 0 ))]
+                value = int(max((t.vector+1)*90,0))
+                data += ['s', t.magnitude, value]
             else:
-                data += ['a', t.magnitude, int(min(abs(t.vector)*255, 255*self.pwm_cap))]
-                data += ['d', t.forward, 'H' if t.vector >= 0 else 'L']
-                data += ['d', t.reverse, 'H' if t.vector <  0 else 'L']
+                value = int(min(abs(t.vector)*255, 255*self.pwm_cap))
+                data += ['a', t.magnitude, value]
+                if t.forward > 0:
+                    data += ['d', t.forward, 'H' if t.vector >= 0 else 'L']
+                if t.reverse > 0:
+                    data += ['d', t.reverse, 'H' if t.vector <  0 else 'L']
         data = bytearray(data)
         self.micro.send(data)
 

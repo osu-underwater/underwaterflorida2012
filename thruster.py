@@ -13,17 +13,24 @@ class Thruster:
 
         self.mount          = self.config.get(device, "mount").split()
         self.orientation    = self.config.get(device, "orientation")
-        self.forward        = self.config.getint(device, "forward")
-        self.reverse        = self.config.getint(device, "reverse")
         self.magnitude      = self.config.getint(device, "magnitude")
-        if self.config.has_option(device, 'servo'):
-            self.servo = self.config.getboolean(device, 'servo')
-        else:
-            self.servo = False
+
+        self.servo = self.config.getboolean(device, 'servo') if \
+                self.config.has_option(device, 'servo') else False
+
+        self.forward = self.config.getint(device, 'forward') if \
+                self.config.has_option(device, 'forward') else 0
+        self.reverse = self.config.getint(device, 'reverse') if \
+                self.config.has_option(device, 'reverse') else 0
+
+        self.fscale = self.config.getfloat(device, 'forward_scale') if \
+                self.config.has_option(device, 'forward_scale') else 1.0
+        self.rscale = self.config.getfloat(device, 'reverse_scale') if \
+                self.config.has_option(device, 'reverse_scale') else 1.0
+        self.rscale = self.rscale * -1
 
         self.vector         = 0
         self.instructions   = []
-        self.max_power      = 1
 
     def go(self, parameters):
         instack = [0]
@@ -42,15 +49,10 @@ class Thruster:
         modifier = instack.pop()
         powval = min((sum([powval[i]**2 for i in powval])**0.5 / Thruster.max_input), 1)
         powval = powval * min(abs(modifier/Thruster.max_input), 1)
-        powval = powval * (-1 if modifier < 0 else 1)
-        powval = powval * self.max_power
+        powval = powval * (self.rscale if modifier < 0 else self.fscale)
         self.vector = powval
 
     def get_instructions(self, mode):
-        if self.config.has_option("mode.%s" % mode, "max_power"):
-            self.max_power = self.config.getfloat("mode.%s" % mode, "max_power")
-        else:
-            self.max_power = 1.0
         options = self.config.options("mode.%s" % mode)
         bestoption = None
         for option in options:

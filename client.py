@@ -12,7 +12,7 @@ TEXT_END = "\033[0m"
 
 def starbar(value):
     retval = "[" + (TEXT_GREEN if value > 0 else TEXT_RED)
-    value = int(round(abs(value)/10.0))
+    value = int(round(abs(value)*10.0))
     counter = 0
     for i in range(value):
         retval += '*'
@@ -28,9 +28,8 @@ if __name__ == "__main__":
     gamepad = pygame.joystick.Joystick(0)
     gamepad.init()
 
-    r = rov.Rov()
-    r.mode_change("pitch")
-    r.mode_change("stdhorizontal")
+    r = rov.Rov(cfg="temp_settings.cfg")
+    r.mode_change("default")
     while True:
         pygame.event.pump()
         parameters = {'xh': gamepad.get_axis(0) * 100, \
@@ -39,13 +38,9 @@ if __name__ == "__main__":
                 'yv': gamepad.get_axis(2) * -100}
         r.go(parameters)
         r.command()
-        '''
         subprocess.call("clear")
-        print
         for v in r.report():
             print starbar(v)
-        print
-        '''
         time.sleep(0.1)
 
     gamepad.quit()

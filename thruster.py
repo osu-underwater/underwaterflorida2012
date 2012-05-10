@@ -33,7 +33,7 @@ class Thruster:
         self.instructions   = []
 
     def go(self, parameters):
-        instack = [0]
+        instack = []
         powval = {}
         for inst in self.instructions:
             if inst == "+":
@@ -51,6 +51,7 @@ class Thruster:
         powval = powval * min(abs(modifier/Thruster.max_input), 1)
         powval = powval * (self.rscale if modifier < 0 else self.fscale)
         self.vector = powval
+        #print self.vector
 
     def get_instructions(self, mode):
         options = self.config.options("mode.%s" % mode)

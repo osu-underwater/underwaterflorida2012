@@ -22,16 +22,18 @@ void EthComm::test() {
         if(client.available()){
             myByte = client.read();
             if (myByte == 'a'){
-                pin = client.read();
+                pin = client.read() - 1;
                 val = client.read();
-                analogWrite(pin, val);
+                input_axes[pin] = val / 255.0;
             } else if (myByte == 'd'){
-                pin = client.read();
+                pin = client.read() - 1;
                 val = client.read();
                 if (val == 'H'){
-                    digitalWrite(pin, HIGH);
+                    if (input_axes[pin] < 0)
+                        input_axes[pin] = inpus_axes[pin] * -1;
                 } else if (val == 'L'){
-                    digitalWrite(pin, LOW);
+                    if (input_axes[pin] > 0)
+                        input_axes[pin] = inpus_axes[pin] * -1;
                 }
             } else {
               Serial.print("Unknown opcode: ");

@@ -8,6 +8,7 @@
 
 #include <SPI.h>
 #include <Ethernet.h>
+#include "globals.h"
 
 class EthComm {
     int pin, val;

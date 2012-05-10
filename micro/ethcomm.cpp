@@ -29,11 +29,13 @@ void EthComm::test() {
                 pin = client.read() - 1;
                 val = client.read();
                 if (val == 'H'){
-                    if (input_axes[pin] < 0)
-                        input_axes[pin] = inpus_axes[pin] * -1;
+                    if (input_axes[pin] < 0){
+                        input_axes[pin] = input_axes[pin] * -1;
+                    }
                 } else if (val == 'L'){
-                    if (input_axes[pin] > 0)
-                        input_axes[pin] = inpus_axes[pin] * -1;
+                    if (input_axes[pin] > 0){
+                        input_axes[pin] = input_axes[pin] * -1;
+                    }
                 }
             } else {
               Serial.print("Unknown opcode: ");

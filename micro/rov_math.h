@@ -60,13 +60,14 @@ float vMod (float v[3]) {
     return output;
 }
 
-// Normalize vector to a vector with same direction, mod 1
+// Normalize vector to a vector with same direction, mod 1, and return old modulus.
 float vNorm (float v[3]) {
-    float tmp;
-    tmp = vMod(v);
-    v[0] /= tmp;
-    v[1] /= tmp;
-    v[2] /= tmp;
+    float mod;
+    mod = vMod(v);
+    v[0] /= mod;
+    v[1] /= mod;
+    v[2] /= mod;
+    return mod;
 }
 
 // 3x3 matrix transpose -- receive matrix mIn as input and output its transpose mOut.
@@ -174,6 +175,16 @@ int mInverse(int n, float mat[3][3]) {
         }
     }
     return 1;
+}
+
+void kalmanUpdate(float& mean1, float& var1, float mean2, float var2) {
+    mean1 = (var2 * mean1 + var1 * mean2) / (var1 + var2);
+    var1  = 1/(1/var1 + 1/var2);
+}
+
+void kalmanPredict(float& mean1, float& var1, float mean2, float var2) {
+    mean1 = mean1 + mean2;
+    var1  = var1 + var2;
 }
 
 #endif // ROV_MATH_H

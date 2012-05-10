@@ -14,20 +14,29 @@
 #include "rov_math.h"
 #include "globals.h"
 
-#define ACC_WEIGHT 0.012   // Accelerometer data weight relative to gyro's weight of 1
-//#define MAG_WEIGHT 0.01
+#define ACC_WEIGHT 0.050   // Accelerometer data weight relative to gyro's weight of 1
+//#define ACC_SCALE_WEIGHT 30   // Reduce accelerometer weight if measured magnitude of acceleration differs significantly from 1 g.
+//#define ACC_SELF_WEIGHT 0.02   // The weight of the newest measurement in the weighted average of accumulated and newest measurements.
+//#define ACC_UPDATE_SIG 50.0   // Update sigma for Kalman filter
+//#define ACC_PREDICT_SIG 10.2   // Prediction sigma for Kalman filter
+
+//#define MAG_WEIGHT 0.05
+
 
 class IMU {
     ADXL345 acc;
     ITG3200 gyro;
     HMC5883 mag;
 
-    float aVec[3];   // Accelerometer output.
-    float gVec[3];   // Gyro output.
-    float mVec[3];   // Magnetometer output.
+    float accScale;
+    float accWeight;   // Variable accelerometer weight.
+    //float accVar;   // Accelerometer variance for Kalman filter.
 
-    // TODO: Implement variable weight coefficient for accelerometer based on
-    // total observed acceleration.
+    float aVec[3];   // Accelerometer read.
+    float aVecLast[3];   // Last accelerometer read.
+    float gVec[3];   // Gyro read.
+    float mVec[3];   // Magnetometer read.
+
     float kbb[3];   // K body unit vector expressed in body coordinates.
     float kgb[3];   // K global unit vector expressed in body coordinates.
     float jgb[3];   // J global unit vector expressed in body coordinates.

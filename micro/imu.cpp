@@ -22,16 +22,13 @@
 
 #include "imu.h"
 
-IMU::IMU() : acc(3, 11),   // range, bandwidth
-             gyro()
-{}
+IMU::IMU() : acc(3, 11) {
+}
 
 void IMU::init() {
     IMU::reset();
     spln("IMU here!");
 
-    // Calibrate sensors. TODO: use accelerometer to find initial tricopter
-    // orientation.
     gyro.calibrate(500);
 
     // Set initial DCM as the identity matrix.
@@ -67,6 +64,7 @@ void IMU::init() {
      *  built (or poorly designed) that small-angle approximations become
      *  insufficient, we can't expect software to fix everything.
      */
+    #ifdef ACC_WEIGHT
     // k body unit vector in body coordinates.
     kbb[0] = 0.0;
     kbb[1] = 0.0;
@@ -86,6 +84,15 @@ void IMU::init() {
     offsetDCM[2][0] =  wAOffset[1];
     offsetDCM[2][1] = -wAOffset[0];
     offsetDCM[2][2] =            1;
+
+    aVec[0] = 0;
+    aVec[1] = 0;
+    aVec[2] = -1;
+    for (int i=0; i<3; i++) {
+        aVecLast[i] = aVec[i];
+    }
+    //accVar = 100.;
+    #endif // ACC_WEIGHT
 }
 
 void IMU::update() {
@@ -98,39 +105,73 @@ void IMU::update() {
     //              gravitational vector is the negative of the K vector.
     // ========================================================================
     #ifdef ACC_WEIGHT
-    acc.poll();   // 1800 us
-    for (int i=0; i<3; i++) {
-        aVec[i] = acc.get(i);
+    if (loopCount % ACC_READ_INTERVAL == 0) {
+        acc.poll();
+        for (int i=0; i<3; i++) {
+            aVec[i] = acc.get(i);
+        }
+
+        // Take weighted average.
+        #ifdef ACC_SELF_WEIGHT
+        for (int i=0; i<3; i++) {
+            aVec[i] = ACC_SELF_WEIGHT * aVec[i] + (1-ACC_SELF_WEIGHT) * aVecLast[i];
+            aVecLast[i] = aVec[i];
+
+            // Kalman filtering?
+            //aVecLast[i] = acc.get(i);
+            //kalmanUpdate(aVec[i], accVar, aVecLast[i], ACC_UPDATE_SIG);
+            //kalmanPredict(aVec[i], accVar, 0.0, ACC_PREDICT_SIG);
+        }
+        #endif // ACC_SELF_WEIGHT
+        accScale = vNorm(aVec);
+
+        // Reduce accelerometer weight if the magnitude of the measured
+        // acceleration is significantly greater than or less than 1 g.
+        //
+        // TODO: Magnitude of acceleration should be reported over telemetry so
+        // the "cutoff" value (the constant before the ABS() below) for
+        // disregaring acceleration input can be more accurately determined.
+        #ifdef ACC_SCALE_WEIGHT
+        accScale = (1 - MIN(1, ACC_SCALE_WEIGHT * ABS(accScale - 1)));
+        accWeight = ACC_WEIGHT * accScale;
+        #else
+        accWeight = ACC_WEIGHT;
+        #endif // ACC_SCALE_WEIGHT
+
+        // Uncomment the loop below to get accelerometer readings in order to
+        // obtain wAOffset.
+        //if (loopCount % COMM_LOOP_INTERVAL == 0) {
+        //    sp("A(");
+        //    sp(aVec[0]*1000); sp(", ");
+        //    sp(aVec[1]*1000); sp(", ");
+        //    sp(aVec[2]*1000);
+        //    sp(")  ");
+        //}
+
+        // Express K global unit vector in BODY frame as kgb for use in drift
+        // correction (we need K to be described in the BODY frame because
+        // gravity is measured by the accelerometer in the BODY frame).
+        // Technically we could just create a transpose of gyroDCM, but since
+        // we don't (yet) have a magnetometer, we don't need the first two rows
+        // of the transpose. This saves a few clock cycles.
+        for (int i=0; i<3; i++) {
+            kgb[i] = gyroDCM[i][2];
+        }
+
+        // Calculate gyro drift correction rotation vector wA, which will be
+        // used later to bring KB closer to the gravity vector (i.e., the
+        // negative of the K vector). Although we do not explicitly negate the
+        // gravity vector, the cross product below produces a rotation vector
+        // that we can later add to the angular displacement vector to correct
+        // for gyro drift in the X and Y axes.
+        vCrossP(kgb, aVec, wA);
+
+        // Divide by ACC_READ_INTERVAL since the acceleration vector is not
+        // updated every loop.
+        for (int i=0; i<3; i++) {
+            wA[i] /= ACC_READ_INTERVAL;
+        }
     }
-    vNorm(aVec);
-
-    // Uncomment the loop below to get accelerometer readings in order to
-    // obtain wAOffset.
-    //if (loopCount % TELEMETRY_LOOP_INTERVAL == 0) {
-    //    sp("(");
-    //    sp(aVec[0]*1000); sp(", ");
-    //    sp(aVec[1]*1000); sp(", ");
-    //    sp(aVec[2]*1000);
-    //    sp(")");
-    //}
-
-    // Express K global unit vector in BODY frame as kgb for use in drift
-    // correction (we need K to be described in the BODY frame because gravity
-    // is measured by the accelerometer in the BODY frame). Technically we
-    // could just create a transpose of gyroDCM, but since we don't (yet) have
-    // a magnetometer, we don't need the first two rows of the transpose. This
-    // saves a few clock cycles.
-    for (int i=0; i<3; i++) {
-        kgb[i] = gyroDCM[i][2];
-    }
-
-    // Calculate gyro drift correction rotation vector wA, which will be used
-    // later to bring KB closer to the gravity vector (i.e., the negative of
-    // the K vector). Although we do not explicitly negate the gravity vector,
-    // the cross product below produces a rotation vector that we can later add
-    // to the angular displacement vector to correct for gyro drift in the X
-    // and Y axes.
-    vCrossP(kgb, aVec, wA);
     #endif // ACC_WEIGHT
 
     // ========================================================================
@@ -145,6 +186,13 @@ void IMU::update() {
     for (int i=0; i<3; i++) {
         mVec[i] = mag.get(i);
     }
+    //if (loopCount % COMM_LOOP_INTERVAL == 0) {
+    //    sp("M(");
+    //    sp(mVec[0]); sp(", ");
+    //    sp(mVec[1]); sp(", ");
+    //    sp(mVec[2]);
+    //    spln(")");
+    //}
 
     // Express J global unit vectory in BODY frame as jgb.
     for (int i=0; i<3; i++) {
@@ -162,21 +210,30 @@ void IMU::update() {
     //     Purpose: Measure the rotation rate of the body about the body's i,
     //              j, and k axes.
     // ========================================================================
-    gyro.poll();   // 2200 us
+    gyro.poll();
     for (int i=0; i<3; i++) {
         gVec[i] = gyro.get(i);
     }
+    //if (loopCount % COMM_LOOP_INTERVAL == 0) {
+    //    sp("G(");
+    //    sp(gVec[0]); sp(", ");
+    //    sp(gVec[1]); sp(", ");
+    //    sp(gVec[2]);
+    //    spln(")");
+    //}
 
-    // Scale gVec by elapsed time (in seconds) to get angle w*dt in radians,
-    // then compute weighted average with the accelerometer and magnetometer
-    // correction vectors to obtain final w*dt.
+    // Scale gVec by elapsed time (in seconds) to get angle w*dt in
+    // radians, then compute weighted average with the accelerometer and
+    // magnetometer correction vectors to obtain final w*dt.
     for (int i=0; i<3; i++) {
         float numerator   = gVec[i] * MASTER_DT/1000000;
         float denominator = 1.0;
 
         #ifdef ACC_WEIGHT
-        numerator   += ACC_WEIGHT * wA[i];
-        denominator += ACC_WEIGHT;
+        if (loopCount % ACC_READ_INTERVAL == 0) {
+            numerator   += accWeight * wA[i];
+            denominator += accWeight;
+        }
         #endif // ACC_WEIGHT
 
         #ifdef MAG_WEIGHT
@@ -248,13 +305,21 @@ void IMU::update() {
     mProduct(dDCM, gyroDCM, gyroDCM);
     orthonormalize(gyroDCM);
 
+    #ifdef ACC_WEIGHT
     // Rotate gyroDCM with offsetDCM.
     mProduct(offsetDCM, gyroDCM, bodyDCM);
     //orthonormalize(bodyDCM);   // TODO: This shouldn't be necessary.
+    #else
+    for (int i=0; i<3; i++) {
+        for (int j=0; j<3; j++) {
+            bodyDCM[i][j] = gyroDCM[i][j];
+        }
+    }
+    #endif // ACC_WEIGHT
 }
 
 void IMU::orthonormalize(float inputDCM[3][3]) {
-    // Takes 700 ns.
+    // Takes 700 us.
     // Orthogonalize the i and j unit vectors (DCMDraft2 Eqn. 19).
     errDCM = vDotP(inputDCM[0], inputDCM[1]);
     vScale(inputDCM[1], -errDCM/2, dDCM[0]);   // i vector correction

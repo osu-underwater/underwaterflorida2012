@@ -11,6 +11,11 @@
 #ifndef ROV_MATH_H
 #define ROV_MATH_H
 
+#define ABS(x) (((x) < 0) ? -(x) : (x))
+#define CLAMP(x, min, max) (((x) < min) ? (min):(((x) > max) ? (max):(x)))
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+
 // Dot product
 float vDotP (float v1[3], float v2[3]) {
     float output = 0;
@@ -56,7 +61,7 @@ float vMod (float v[3]) {
 }
 
 // Normalize vector to a vector with same direction, mod 1
-void vNorm (float v[3]) {
+float vNorm (float v[3]) {
     float tmp;
     tmp = vMod(v);
     v[0] /= tmp;

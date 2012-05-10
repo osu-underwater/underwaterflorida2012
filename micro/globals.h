@@ -8,47 +8,64 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+// #define DEBUG
+
 // ============================================================================
 // Variables
 // ============================================================================
+int armCount;   // Arm status counter.
 int loopCount;   // Count system loops.
-float pwmOut[4];
+int16_t pwmShift[4], pwmOut[4];   // 10 bit PWM output duty cycle.
 float bodyDCM[3][3];   // Current body orientation calculated by IMU.
-float targetRot[3], currentRot[3], pidRot[3];
-
+float targetAngPos[3], targetAngVel[3], pidAngPos[3], pidAngVel[3], currentAngPos[3];
+float gVec[3];   // This used to be part of ITG3200, but is now global so the PID controller can have direct access to the gyro measurements. This is a hack, and I am a bad programmer.
 
 // ============================================================================
 // PID
 //     Match the number of structs to the number of PID value defines.
 // ============================================================================
 struct PIDdata {
+    uint8_t id;
+    float deltaPIDTime;
     float P, I, D;
     float lastValue;
     float integral;
-} PID[4];
+} PID[10];
 
-#define PID_ROT_X 0
-#define PID_ROT_Y 1
-#define PID_ROT_Z 2
+#define PID_ANG_POS_X  0
+#define PID_ANG_POS_Y  1
+#define PID_ANG_POS_Z  2
+#define PID_ANG_VEL_X 3
+#define PID_ANG_VEL_Y 4
+#define PID_ANG_VEL_Z 5
 
-#define XY_P_GAIN 32.0 // 17  30  35  42
-#define XY_I_GAIN 10.0 // 10  20  50  24
-#define XY_D_GAIN -8.0 //  6  10   9  10
+#define XY_ANG_POS_P_GAIN   4.0
+#define XY_ANG_POS_I_GAIN   0.0
+#define XY_ANG_POS_D_GAIN  -0.0
+#define XY_ANG_VEL_P_GAIN 14.0
+#define XY_ANG_VEL_I_GAIN  0.0
+#define XY_ANG_VEL_D_GAIN -0.14
 
-#define Z_P_GAIN 100.0
-#define Z_I_GAIN 0.0
-#define Z_D_GAIN 0.0
+#define Z_ANG_POS_P_GAIN 0.0
+#define Z_ANG_POS_I_GAIN 0.0
+#define Z_ANG_POS_D_GAIN 0.0
+#define Z_ANG_VEL_P_GAIN 0.0
+#define Z_ANG_VEL_I_GAIN 0.0
+#define Z_ANG_VEL_D_GAIN 0.0
 
-/*****************************************************************************
- * Serial: everything that has to do with TX/RX.
- *****************************************************************************/
+#define TARGET_ANG_POS_CAP PI/12   // Cap maximum angular position.
+#define TARGET_ANG_VEL_CAP 2*PI   // Cap maximum angular velocity.
+
 
 // ============================================================================
 // SERIAL IN
 // ============================================================================
-#define BAUDRATE 115200
-#define SERHEAD     255   // Serial header byte. Pilot interprets the four bytes following this header byte as motor commands.
-#define PACKETSIZE 6     // Each packet contains (excluding header) X, Y, Twist, Z, and two bytes for button values.
+#define BAUDRATE 115200   // Do NOT use 57600 or 115200 here, because the error rate is too high! (At least, over a wireless connection.)
+#define SERHEAD    255   // Serial header byte. Pilot interprets the four bytes following this header byte as motor commands.
+#define SER_PACKET_LEN 6     // Each packet contains (excluding header) X, Y, Twist, Z, and two bytes for button values.
+#define SER_READ_BUF_LEN 100   // Number of bytes of serial data in buffer (used by Pilot).
+#define SER_READ_CHUNK_LEN 2   // Number of bytes to read off serial bus every loop.
+
 #define INPUT_MIN  0     // Minimum integer input value from joystick.
 #define INPUT_MAX  250   // Maximum integer input value from joystick.
 #define SX 0   // Serial byte location for joystick X axis.
@@ -61,10 +78,14 @@ struct PIDdata {
 // ============================================================================
 // SERIAL OUT
 // ============================================================================
+#define SER_WRITE_BUF_LEN 150   // Number of bytes of serial data in TX buffer.
+#define SER_WRITE_CHUNK_LEN 15   // Number of bytes to send per loop.
+
+#define SEND_ARM_STATUS
 //#define SEND_TARGET_ROTATION
-//#define SEND_MOTOR_VALUES
+#define SEND_MOTOR_VALUES
 #define SEND_DCM
-//#define SEND_PID
+#define SEND_PID_DATA
 
 #define DCM_SER_TAG 0xfb
 #define ROT_SER_TAG 0xfc
@@ -72,25 +93,26 @@ struct PIDdata {
 #define PID_SER_TAG 0xfe
 #define FIELD_SER_TAG 0xff
 
-/*****************************************************************************
- * Software configuration: any parameter that is purely code-related or is
- * relatively frequently changed.
- *****************************************************************************/
 
-#define MASTER_DT           10000   // 10000 us interval = 100 Hz master loop.
-#define CONTROL_LOOP_INTERVAL   2   // 1/2 master = 50 Hz. NOTE: This frequency should be HIGHER than comm.py's dataSend frequency!
-#define TELEMETRY_LOOP_INTERVAL 2   // 1/5 master = 20 Hz.
-#define DOGLIFE 300   // Watchdog life in milliseconds.
+// ============================================================================
+// Software configuration: any parameter that is purely code-related or is
+// relatively frequently changed.
+// ============================================================================
+#define MASTER_DT            6000   // 6000 us interval = 166 Hz master loop.
+#define CONTROL_LOOP_INTERVAL   1   // 1x master = 166 Hz.
+#define ACC_READ_INTERVAL       5   // Read accelerometer every 5th loop.
+#define COMM_LOOP_INTERVAL      5   // 1/5 master = 33 Hz.
+#define DOGLIFE 600   // Watchdog life in milliseconds.
 
-//#define DCM_COEFF 90   // Scale current-to-target DCM difference.
-//#define GYRO_COEFF 15   // Try to stabilize craft.
-//#define ACCEL_COEFF 90   // TEST: Try to stabilize craft.
+// Throttle stuff. Minimum signal is 750 us. Maximum signal is 2200 us. Hover
+// is around 1200 us.
+#define TMIN   432   // Minimum throttle PWM duty cycle. At 400 kHz, 2500 * 432/1023 = 1055 us. Although simonk's firmware should register 1060 us as the minimum throttle, one of my ESCs will not arm until it is this low.
+#define THOVER 480   // Hover throttle PWM duty cycle
+#define TMAX   600   // Maximum throttle PWM duty cycle (at 400 kHz, 2500 * 761/1023 = 1860 us).
 
-// Throttle stuff. Minimum signal is 750 ms. Maximum signal is 2200 ms. Hover
-// is around 1200 ms.
-#define TMIN   750   // Minimum throttle signal in ms. (Absolute minimum is 750.)
-#define THOVER 1200   // Hover throttle signal in ms.
-#define TMAX   1600   // Maximum throttle signal in ms. (Absolute maximum is 2200.)
+#define SERVO_US_ZERO 1430   // Servo "zero" position (i.e., level to chassis).
+#define SERVO_US_NEUTRAL 1370   // Servo neutral position (i.e., net Z torque = 0).
+#define SERVO_US_PER_RAD 500   // Microseconds per radian of servo rotation.
 
 #define TIME_TO_ARM 2000000   // This divided by MASTER_DT determines how long it takes to arm the system.
 #define MOTOR_ARM_THRESHOLD 30   // This is added to TMIN to determine whether or not to arm the system.
@@ -100,70 +122,79 @@ struct PIDdata {
 #define MOTOR_L 2   // Left motor array index.
 #define SERVO_T 3   // Tail servo array index.
 
+
 // ============================================================================
 // Buttons
 // ============================================================================
 #define BUTTON_UNDEFINED            0
 #define BUTTON_RESET_YAW            1
-#define BUTTON_ZERO_INTEGRAL        2
+#define BUTTON_ACRO_MODE            2
 #define BUTTON_DECREASE_TRIM        3
-#define BUTTON_UNDEFINED            4
+#define BUTTON_ZERO_INTEGRAL        4
 #define BUTTON_INCREASE_TRIM        5
-#define BUTTON_DECREASE_XY_P_GAIN   6
-#define BUTTON_INCREASE_XY_P_GAIN   7
-#define BUTTON_DECREASE_XY_I_GAIN   8
-#define BUTTON_INCREASE_XY_I_GAIN   9
-#define BUTTON_DECREASE_XY_D_GAIN   10
-#define BUTTON_INCREASE_XY_D_GAIN   11
+#define BUTTON_DECREASE_XY_ANG_POS_P_GAIN   6
+#define BUTTON_INCREASE_XY_ANG_POS_P_GAIN   7
+#define BUTTON_DECREASE_XY_ANG_VEL_P_GAIN   8
+#define BUTTON_INCREASE_XY_ANG_VEL_P_GAIN   9
+#define BUTTON_DECREASE_XY_ANG_VEL_D_GAIN   10
+#define BUTTON_INCREASE_XY_ANG_VEL_D_GAIN   11
 
-/*****************************************************************************
- * Hardware configuration: any parameter that is changed so infrequently that
- * it may as well be hard-coded.
- *****************************************************************************/
+// ============================================================================
+// Hardware configuration: any parameter that is changed so infrequently that
+// it may as well be hard-coded.
+// ============================================================================
 
 #define MOTOR_T_OFFSET 0   // Speed offset for tail motor.
 #define MOTOR_R_OFFSET 0   // Speed offset for right motor.
 #define MOTOR_L_OFFSET 0   // Speed offset for left motor.
-#define MOTOR_T_SCALE  1.02   // Scale speed of tail motor.
+#define MOTOR_T_SCALE  1   // Scale speed of tail motor.
 #define MOTOR_R_SCALE  1   // Scale speed of right motor.
 #define MOTOR_L_SCALE  1   // Scale speed of left motor.
-#define TAIL_SERVO_DEFAULT_POSITION 1185
 #define TAIL_SERVO_SCALE 1   // Scale tail servo rotation.
 #define Z_ROT_SPEED 1   // Scale how much joystick twist input affects target Z rotation. A value of 1 here means a maximum Z rotation speed is 1 rad/s.
 
-// "Offset" values for accelerometer.
-#define ACCEL_X_OFFSET -0.047
-#define ACCEL_Y_OFFSET -0.022
-#define ACCEL_Z_OFFSET -0.998
+// Calibration values for accelerometer.
+#define ACCEL_X_OFFSET -0.033
+#define ACCEL_Y_OFFSET -0.011
+#define ACCEL_Z_OFFSET -0.999
 
-#define PMT 4   // Tail motor pin.
+// Calibration values for magnetometer. These are what the magnetometer axes
+// see as "zero".
+#define MAG_X_MIN -314
+#define MAG_X_MAX 320
+#define MAG_Y_MIN -316
+#define MAG_Y_MAX 317
+#define MAG_Z_MIN -427
+#define MAG_Z_MAX 165
+
+#define PMT 5   // Tail motor pin.
 #define PMR 2   // Right motor pin.
 #define PML 3   // Left motor pin.
-#define PST 5   // Tail servo pin.
+#define PST 4   // Tail servo pin.
 
 
-/*****************************************************************************
- * Flight modes: not yet implemented.
- *****************************************************************************/
+// ============================================================================
+// Flight modes
+// ============================================================================
 
-//#define OFF 0
-//#define IDLE 1
-//#define HOVER 2
-//#define ACRO 3
-//#define AUTO 4
-//#define AUTO_HOVER 5
+#define OFF 0
+#define IDLE 1
+#define HOVER 2
+#define ACRO 3
+#define AUTO 4
+#define AUTO_HOVER 5
 
 
-/*****************************************************************************
- * Constants
- *****************************************************************************/
+// ============================================================================
+// Constants
+// ============================================================================
 
 #define PI 3.141592653589793238462643383279502884197f
 
 
-/*****************************************************************************
- * Functions
- *****************************************************************************/
+// ============================================================================
+// Functions
+// ============================================================================
 
 void zeroStr(char *sStr) {
     for (int i=0; i<sizeof(sStr); i++) {

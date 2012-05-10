@@ -44,7 +44,7 @@ int main(void) {
             // ================================================================
             // Telemetry loop
             // ================================================================
-            if (loopCount % TELEMETRY_LOOP_INTERVAL == 0) {
+            if (loopCount % COMM_LOOP_INTERVAL == 0) {
                 sendTelemetry(nextRunTime);
                 eth.test();
             }

@@ -69,12 +69,18 @@ struct PIDdata {
 
 #define INPUT_MIN  0     // Minimum integer input value from joystick.
 #define INPUT_MAX  250   // Maximum integer input value from joystick.
-#define SX 0   // Serial byte location for joystick X axis.
-#define SY 1   // Serial byte location for joystick Y axis.
-#define ST 2   // Serial byte location for joystick T (twist) axis.
-#define SZ 3   // Serial byte location for joystick Z axis.
+#define LH 0   // Serial byte location for joystick X axis.
+#define LV 1   // Serial byte location for joystick Y axis.
+#define RH 2   // Serial byte location for joystick T (twist) axis.
+#define RV 3   // Serial byte location for joystick Z axis.
 #define SB1 4   // Serial byte location for joystick buttons (0 to 7).
 #define SB2 5   // Serial byte location for joystick buttons (8 to 15).
+
+// TODO: DEPRECATED
+#define SX 0
+#define SY 1
+#define ST 2
+#define SZ 3
 
 // ============================================================================
 // SERIAL OUT
@@ -107,9 +113,9 @@ struct PIDdata {
 
 // Throttle stuff. Minimum signal is 750 us. Maximum signal is 2200 us. Hover
 // is around 1200 us.
-#define TMIN   432   // Minimum throttle PWM duty cycle. At 400 kHz, 2500 * 432/1023 = 1055 us. Although simonk's firmware should register 1060 us as the minimum throttle, one of my ESCs will not arm until it is this low.
-#define THOVER 480   // Hover throttle PWM duty cycle
-#define TMAX   600   // Maximum throttle PWM duty cycle (at 400 kHz, 2500 * 761/1023 = 1860 us).
+#define TMIN   1000   // Minimum throttle PWM duty cycle. At 400 kHz, 2500 * 432/1023 = 1055 us. Although simonk's firmware should register 1060 us as the minimum throttle, one of my ESCs will not arm until it is this low.
+#define TNEUTRAL 1500   // Hover throttle PWM duty cycle
+#define TMAX   2000   // Maximum throttle PWM duty cycle (at 400 kHz, 2500 * 761/1023 = 1860 us).
 
 #define SERVO_US_ZERO 1430   // Servo "zero" position (i.e., level to chassis).
 #define SERVO_US_NEUTRAL 1370   // Servo neutral position (i.e., net Z torque = 0).
@@ -118,11 +124,13 @@ struct PIDdata {
 #define TIME_TO_ARM 2000000   // This divided by MASTER_DT determines how long it takes to arm the system.
 #define MOTOR_ARM_THRESHOLD 30   // This is added to TMIN to determine whether or not to arm the system.
 
-#define MOTOR_T 0   // Tail motor array index.
-#define MOTOR_R 1   // Right motor array index.
-#define MOTOR_L 2   // Left motor array index.
-#define SERVO_T 3   // Tail servo array index.
-
+// Array indices.
+#define THRUSTER_R  0
+#define THRUSTER_FR 1
+#define THRUSTER_FL 2
+#define THRUSTER_L  3
+#define THRUSTER_BL 4
+#define THRUSTER_BR 5
 
 // ============================================================================
 // Buttons
@@ -168,10 +176,12 @@ struct PIDdata {
 #define MAG_Z_MIN -427
 #define MAG_Z_MAX 165
 
-#define PMT 5   // Tail motor pin.
-#define PMR 2   // Right motor pin.
-#define PML 3   // Left motor pin.
-#define PST 4   // Tail servo pin.
+#define PIN_R  99
+#define PIN_FR 99
+#define PIN_FL 99
+#define PIN_L  99
+#define PIN_BL 99
+#define PIN_BR 99
 
 
 // ============================================================================

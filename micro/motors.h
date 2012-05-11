@@ -72,15 +72,20 @@ void calculate_pwm_outputs(float pwmThrottle, int16_t* pwmShift, int16_t* pwmOut
     // corresponding arm is heavier.
     // TODO: The last term for each pwmOutput is INACCURATE. Fix this.
     // ====================================================================
-    pwmOutput[SERVO_T] = SERVO_US_NEUTRAL + pwmShift[2];
+    pwmOutput[THRUSTER_R] = TNEUTRAL + pwmThrottle + pwmShift[2];
+    pwmOutput[THRUSTER_L] = TNEUTRAL + pwmThrottle - pwmShift[2];
 
-    pwmOutput[MOTOR_T] = (pwmThrottle + -pwmShift[0]) / cos(((float) pwmOutput[SERVO_T]-SERVO_US_ZERO)/SERVO_US_PER_RAD);
-    pwmOutput[MOTOR_R] =  pwmThrottle +  pwmShift[0] - pwmShift[1]*sqrt(3);
-    pwmOutput[MOTOR_L] =  pwmThrottle +  pwmShift[0] + pwmShift[1]*sqrt(3);
+    pwmOutput[THRUSTER_FR] = TNEUTRAL + pwmShift[0];
+    pwmOutput[THRUSTER_FL] = TNEUTRAL + pwmShift[0];
 
-    pwmOutput[MOTOR_T] = TMIN + MOTOR_T_OFFSET + MOTOR_T_SCALE * pwmOutput[MOTOR_T];
-    pwmOutput[MOTOR_R] = TMIN + MOTOR_R_OFFSET + MOTOR_R_SCALE * pwmOutput[MOTOR_R];
-    pwmOutput[MOTOR_L] = TMIN + MOTOR_L_OFFSET + MOTOR_L_SCALE * pwmOutput[MOTOR_L];
+    pwmOutput[THRUSTER_BR] = TNEUTRAL - pwmShift[0];
+    pwmOutput[THRUSTER_BR] = TNEUTRAL - pwmShift[0];
+
+
+    // TODO: Offsets and scales.
+    //pwmOutput[MOTOR_T] = TMIN + MOTOR_T_OFFSET + MOTOR_T_SCALE * pwmOutput[MOTOR_T];
+    //pwmOutput[MOTOR_R] = TMIN + MOTOR_R_OFFSET + MOTOR_R_SCALE * pwmOutput[MOTOR_R];
+    //pwmOutput[MOTOR_L] = TMIN + MOTOR_L_OFFSET + MOTOR_L_SCALE * pwmOutput[MOTOR_L];
 
     // ====================================================================
     // After finding the maximum and minimum motor values, limit, but NOT
@@ -88,13 +93,19 @@ void calculate_pwm_outputs(float pwmThrottle, int16_t* pwmShift, int16_t* pwmOut
     // Doing this incorrectly will result in motor values seemingly stuck
     // mostly at either extremes.
     // ====================================================================
-    int mapUpper = pwmOutput[MOTOR_T] > pwmOutput[MOTOR_R] ? pwmOutput[MOTOR_T] : pwmOutput[MOTOR_R];
-    mapUpper = mapUpper > pwmOutput[MOTOR_L] ? mapUpper : pwmOutput[MOTOR_L];
+    int mapUpper = pwmOutput[THRUSTER_R] > pwmOutput[THRUSTER_FR] ? pwmOutput[THRUSTER_R] : pwmOutput[THRUSTER_FR];
+    mapUpper = mapUpper > pwmOutput[THRUSTER_FL] ? mapUpper : pwmOutput[THRUSTER_FL];
+    mapUpper = mapUpper > pwmOutput[THRUSTER_L] ? mapUpper : pwmOutput[THRUSTER_L];
+    mapUpper = mapUpper > pwmOutput[THRUSTER_BL] ? mapUpper : pwmOutput[THRUSTER_BL];
+    mapUpper = mapUpper > pwmOutput[THRUSTER_BR] ? mapUpper : pwmOutput[THRUSTER_BR];
     mapUpper = mapUpper > TMAX ? mapUpper : TMAX;
 
-    int mapLower = pwmOutput[MOTOR_T] < pwmOutput[MOTOR_R] ? pwmOutput[MOTOR_T] : pwmOutput[MOTOR_R];
-    mapLower = mapLower < pwmOutput[MOTOR_L] ? mapLower : pwmOutput[MOTOR_L];
-    mapLower = mapLower < TMIN ? mapLower : TMIN;
+    int mapLower = pwmOutput[THRUSTER_R] < pwmOutput[THRUSTER_FR] ? pwmOutput[THRUSTER_R] : pwmOutput[THRUSTER_FR];
+    mapLower = mapLower < pwmOutput[THRUSTER_FL] ? mapLower : pwmOutput[THRUSTER_FL];
+    mapLower = mapLower < pwmOutput[THRUSTER_L] ? mapLower : pwmOutput[THRUSTER_L];
+    mapLower = mapLower < pwmOutput[THRUSTER_BL] ? mapLower : pwmOutput[THRUSTER_BL];
+    mapLower = mapLower < pwmOutput[THRUSTER_BR] ? mapLower : pwmOutput[THRUSTER_BR];
+    mapLower = mapLower < TMAX ? mapLower : TMAX;
 
     // We shouldn't have to use these, but uncomment the following two
     // lines if pwmOutput goes crazy and makes mapUpper lower than mapLower:
@@ -106,12 +117,12 @@ void calculate_pwm_outputs(float pwmThrottle, int16_t* pwmShift, int16_t* pwmOut
     // Otherwise, kill motors. Note that map(), an Arduino function, does
     // integer math and truncates fractions.
     // ====================================================================
-    for (int i=0; i<3; i++) {
+    for (int i=0; i<6; i++) {
         if (mapUpper > mapLower) {
             pwmOutput[i] = map(pwmOutput[i], mapLower, mapUpper, TMIN, TMAX);
         }
         else {
-            pwmOutput[i] = TMIN;
+            pwmOutput[i] = TNEUTRAL;
         }
     }
 }

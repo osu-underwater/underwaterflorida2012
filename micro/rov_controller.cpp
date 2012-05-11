@@ -6,6 +6,7 @@
 //#include <Wire.h>
 #include "ethcomm.cpp"
 #include "imu.cpp"
+#include "pilot.cpp"
 #include "telemetry.h"
 
 int main(void) {
@@ -17,11 +18,20 @@ int main(void) {
     Serial.begin(115200);
 
     EthComm eth;
+    Pilot pilot;
 
     IMU imu;
     imu.init();
 
     Serial.println("Setup complete.");
+
+    Servo pwmDevice[6];
+    pwmDevice[0].attach(THRUSTER_R);
+    pwmDevice[1].attach(THRUSTER_FR);
+    pwmDevice[2].attach(THRUSTER_FL);
+    pwmDevice[3].attach(THRUSTER_L);
+    pwmDevice[4].attach(THRUSTER_BL);
+    pwmDevice[5].attach(THRUSTER_BR);
 
     uint64_t nextRunTime = micros();
     loopCount = 0;
@@ -38,7 +48,11 @@ int main(void) {
             // Control loop
             // ================================================================
             if (loopCount % CONTROL_LOOP_INTERVAL == 0) {
-                // UPDATE PINS HERE
+                pilot.fly();
+
+                for (int i=0; i<6; i++) {
+                    pwmDevice[i].writeMicroseconds(pwmOut[i]);
+                }
             }
 
             // ================================================================

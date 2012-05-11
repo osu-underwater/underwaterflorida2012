@@ -52,7 +52,19 @@ void EthComm::TX() {
     client = server.available();
 
     if (client.connected()){
-        client.write('Q');
+        client.flush();
+        client.write('D');
+        for (int i = 0; i < 9; i++){
+            val = bodyDCM[i] * 127 + 127;
+            client.write(val);
+        }
+        client.write('P');
+        val = PID[PID_ANG_POS_X].P * 255;
+        client.write(val);
+        val = PID[PID_ANG_VEL_X].P * 255;
+        client.write(val);
+        val = PID[PID_ANG_VEL_X].D * 255;
+        client.write(val);
     } else {
         client.connect();
     }

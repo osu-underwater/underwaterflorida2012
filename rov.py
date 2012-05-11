@@ -15,6 +15,7 @@ class Rov:
         self.mode = ""
         self.micro = connection.Connection()
         self.micro.connect()
+        self.buttons = 0x00
 
     def mode_change(self, mode):
         self.mode = mode
@@ -26,6 +27,7 @@ class Rov:
     def go(self, parameters):
         for t in self.thrusters:
             t.go(parameters)
+        self.buttons = parameters['buttons']
 
     def report(self):
         return [t.vector for t in self.thrusters]
@@ -35,6 +37,7 @@ class Rov:
         'a' - Analog write (2 operands: pin, value)
         'd' - Digital write (2 operands: pin, high/low)
         's' - Servo write (2 operands: pin, angle [0-180])
+        'b' - Buttons byte (1 operand: button value)
         """
         data = []
         for t in self.thrusters:
@@ -48,6 +51,7 @@ class Rov:
                     data += ['d', t.forward, 'H' if t.vector >= 0 else 'L']
                 if t.reverse > 0:
                     data += ['d', t.reverse, 'H' if t.vector <  0 else 'L']
+        data += ['b', self.buttons]
         data = bytearray(data)
         self.micro.send(data)
 

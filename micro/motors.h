@@ -75,11 +75,23 @@ void calculate_pwm_outputs(float pwmThrottle, int16_t* pwmShift, int16_t* pwmOut
     pwmOutput[THRUSTER_R] = TNEUTRAL + pwmThrottle + pwmShift[2];
     pwmOutput[THRUSTER_L] = TNEUTRAL + pwmThrottle - pwmShift[2];
 
-    pwmOutput[THRUSTER_FR] = TNEUTRAL + pwmShift[0];
-    pwmOutput[THRUSTER_FL] = TNEUTRAL + pwmShift[0];
+    if (pwmShift[0] > 0) {
+        digOut[THRUSTER_FR_DIG] = 1;   // Set forward direction.
+        digOut[THRUSTER_FL_DIG] = 1;   // Set forward direction.
+        digOut[THRUSTER_BL_DIG] = 0;   // Set reverse direction.
+        digOut[THRUSTER_BR_DIG] = 0;   // Set reverse direction.
+    }
+    else if (pwmShift[0] < 0) {
+        digOut[THRUSTER_FR_DIG] = 0;   // Set reverse direction.
+        digOut[THRUSTER_FL_DIG] = 0;   // Set reverse direction.
+        digOut[THRUSTER_BL_DIG] = 1;   // Set forward direction.
+        digOut[THRUSTER_BR_DIG] = 1;   // Set forward direction.
+    }
 
-    pwmOutput[THRUSTER_BR] = TNEUTRAL - pwmShift[0];
-    pwmOutput[THRUSTER_BR] = TNEUTRAL - pwmShift[0];
+    pwmOutput[THRUSTER_FR] = pwmShift[0];
+    pwmOutput[THRUSTER_FL] = pwmShift[0];
+    pwmOutput[THRUSTER_BR] = pwmShift[0];
+    pwmOutput[THRUSTER_BR] = pwmShift[0];
 
 
     // TODO: Offsets and scales.
@@ -87,43 +99,47 @@ void calculate_pwm_outputs(float pwmThrottle, int16_t* pwmShift, int16_t* pwmOut
     //pwmOutput[MOTOR_R] = TMIN + MOTOR_R_OFFSET + MOTOR_R_SCALE * pwmOutput[MOTOR_R];
     //pwmOutput[MOTOR_L] = TMIN + MOTOR_L_OFFSET + MOTOR_L_SCALE * pwmOutput[MOTOR_L];
 
-    // ====================================================================
-    // After finding the maximum and minimum motor values, limit, but NOT
-    // fit, motor values to minimum and maximum throttle [TMIN, TMAX]).
-    // Doing this incorrectly will result in motor values seemingly stuck
-    // mostly at either extremes.
-    // ====================================================================
-    int mapUpper = pwmOutput[THRUSTER_R] > pwmOutput[THRUSTER_FR] ? pwmOutput[THRUSTER_R] : pwmOutput[THRUSTER_FR];
-    mapUpper = mapUpper > pwmOutput[THRUSTER_FL] ? mapUpper : pwmOutput[THRUSTER_FL];
-    mapUpper = mapUpper > pwmOutput[THRUSTER_L] ? mapUpper : pwmOutput[THRUSTER_L];
-    mapUpper = mapUpper > pwmOutput[THRUSTER_BL] ? mapUpper : pwmOutput[THRUSTER_BL];
-    mapUpper = mapUpper > pwmOutput[THRUSTER_BR] ? mapUpper : pwmOutput[THRUSTER_BR];
+
+    int mapUpper, mapLower;
+
+    // Cap PWM values for CrustCrawler thrusters.
+    mapUpper = pwmOutput[THRUSTER_R] > pwmOutput[THRUSTER_L] ? pwmOutput[THRUSTER_R] : pwmOutput[THRUSTER_L];
     mapUpper = mapUpper > TMAX ? mapUpper : TMAX;
 
-    int mapLower = pwmOutput[THRUSTER_R] < pwmOutput[THRUSTER_FR] ? pwmOutput[THRUSTER_R] : pwmOutput[THRUSTER_FR];
-    mapLower = mapLower < pwmOutput[THRUSTER_FL] ? mapLower : pwmOutput[THRUSTER_FL];
-    mapLower = mapLower < pwmOutput[THRUSTER_L] ? mapLower : pwmOutput[THRUSTER_L];
-    mapLower = mapLower < pwmOutput[THRUSTER_BL] ? mapLower : pwmOutput[THRUSTER_BL];
-    mapLower = mapLower < pwmOutput[THRUSTER_BR] ? mapLower : pwmOutput[THRUSTER_BR];
+    mapLower = pwmOutput[THRUSTER_R] < pwmOutput[THRUSTER_L] ? pwmOutput[THRUSTER_R] : pwmOutput[THRUSTER_L];
     mapLower = mapLower < TMAX ? mapLower : TMAX;
 
-    // We shouldn't have to use these, but uncomment the following two
-    // lines if pwmOutput goes crazy and makes mapUpper lower than mapLower:
-    //mapUpper = mapUpper > TMIN ? mapUpper : TMIN+1;
-    //mapLower = mapLower < TMAX ? mapLower : TMAX-1;
+    if (mapUpper > mapLower) {
+        pwmOutput[THRUSTER_R] = map(pwmOutput[THRUSTER_R], mapLower, mapUpper, TMIN, TMAX);
+        pwmOutput[THRUSTER_L] = map(pwmOutput[THRUSTER_L], mapLower, mapUpper, TMIN, TMAX);
+    }
+    else {
+        pwmOutput[THRUSTER_R] = TNEUTRAL;
+        pwmOutput[THRUSTER_L] = TNEUTRAL;
+    }
 
-    // ====================================================================
-    // If map bounds are reasonable, remap range to [mapLower, mapUpper].
-    // Otherwise, kill motors. Note that map(), an Arduino function, does
-    // integer math and truncates fractions.
-    // ====================================================================
-    for (int i=0; i<6; i++) {
-        if (mapUpper > mapLower) {
-            pwmOutput[i] = map(pwmOutput[i], mapLower, mapUpper, TMIN, TMAX);
-        }
-        else {
-            pwmOutput[i] = TNEUTRAL;
-        }
+    // Cap PWM values for SeaBotics thrusters.
+    mapUpper = pwmOutput[THRUSTER_FR] > pwmOutput[THRUSTER_FL] ? pwmOutput[THRUSTER_FR] : pwmOutput[THRUSTER_FL];
+    mapUpper = mapUpper > pwmOutput[THRUSTER_BL] ? mapUpper : pwmOutput[THRUSTER_BL];
+    mapUpper = mapUpper > pwmOutput[THRUSTER_BR] ? mapUpper : pwmOutput[THRUSTER_BR];
+    mapUpper = mapUpper > SBMAX ? mapUpper : SBMAX;
+
+    mapLower = pwmOutput[THRUSTER_FR] < pwmOutput[THRUSTER_FL] ? pwmOutput[THRUSTER_FR] : pwmOutput[THRUSTER_FL];
+    mapLower = mapLower < pwmOutput[THRUSTER_BL] ? mapLower : pwmOutput[THRUSTER_BL];
+    mapLower = mapLower < pwmOutput[THRUSTER_BR] ? mapLower : pwmOutput[THRUSTER_BR];
+    mapLower = mapLower < SBMAX ? mapLower : SBMAX;
+
+    if (mapUpper > mapLower) {
+        pwmOutput[THRUSTER_FR] = map(pwmOutput[THRUSTER_FR], mapLower, mapUpper, SBMIN, SBMAX);
+        pwmOutput[THRUSTER_FL] = map(pwmOutput[THRUSTER_FL], mapLower, mapUpper, SBMIN, SBMAX);
+        pwmOutput[THRUSTER_BL] = map(pwmOutput[THRUSTER_BL], mapLower, mapUpper, SBMIN, SBMAX);
+        pwmOutput[THRUSTER_BR] = map(pwmOutput[THRUSTER_BR], mapLower, mapUpper, SBMIN, SBMAX);
+    }
+    else {
+        pwmOutput[THRUSTER_FR] = SBMIN;
+        pwmOutput[THRUSTER_FL] = SBMIN;
+        pwmOutput[THRUSTER_BL] = SBMIN;
+        pwmOutput[THRUSTER_BR] = SBMIN;
     }
 }
 

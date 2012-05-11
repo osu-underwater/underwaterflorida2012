@@ -16,6 +16,7 @@
 int armCount;   // Arm status counter.
 int loopCount;   // Count system loops.
 int16_t pwmShift[4], pwmOut[4];   // 10 bit PWM output duty cycle.
+int digOut[4];   // Four digital outputs for directional control of Seabotics thrusters.
 float bodyDCM[3][3];   // Current body orientation calculated by IMU.
 float targetAngPos[3], targetAngVel[3], pidAngPos[3], pidAngVel[3], currentAngPos[3];
 float gVec[3];   // This used to be part of ITG3200, but is now global so the PID controller can have direct access to the gyro measurements. This is a hack, and I am a bad programmer.
@@ -113,13 +114,14 @@ struct PIDdata {
 
 // Throttle stuff. Minimum signal is 750 us. Maximum signal is 2200 us. Hover
 // is around 1200 us.
-#define TMIN   1000   // Minimum throttle PWM duty cycle. At 400 kHz, 2500 * 432/1023 = 1055 us. Although simonk's firmware should register 1060 us as the minimum throttle, one of my ESCs will not arm until it is this low.
-#define TNEUTRAL 1500   // Hover throttle PWM duty cycle
-#define TMAX   2000   // Maximum throttle PWM duty cycle (at 400 kHz, 2500 * 761/1023 = 1860 us).
+#define TMIN   1000   // Minimum throttle PWM duty cycle in microseconds.
+#define TNEUTRAL 1500   // Hover throttle PWM duty cycle in microseconds.
+#define TMAX   2000   // Maximum throttle PWM duty cycle in microseconds.
 
-#define SERVO_US_ZERO 1430   // Servo "zero" position (i.e., level to chassis).
-#define SERVO_US_NEUTRAL 1370   // Servo neutral position (i.e., net Z torque = 0).
-#define SERVO_US_PER_RAD 500   // Microseconds per radian of servo rotation.
+// Throttle PWM
+#define SBMIN   200   // Minimum throttle PWM duty cycle out of 1023.
+#define SBMAX   800   // Maximum throttle PWM duty cycle out of 1023.
+
 
 #define TIME_TO_ARM 2000000   // This divided by MASTER_DT determines how long it takes to arm the system.
 #define MOTOR_ARM_THRESHOLD 30   // This is added to TMIN to determine whether or not to arm the system.
@@ -131,6 +133,11 @@ struct PIDdata {
 #define THRUSTER_L  3
 #define THRUSTER_BL 4
 #define THRUSTER_BR 5
+
+#define THRUSTER_FR_DIG 0
+#define THRUSTER_FL_DIG 1
+#define THRUSTER_BL_DIG 2
+#define THRUSTER_BR_DIG 3
 
 // ============================================================================
 // Buttons
@@ -176,12 +183,17 @@ struct PIDdata {
 #define MAG_Z_MIN -427
 #define MAG_Z_MAX 165
 
-#define PIN_R  99
-#define PIN_FR 99
-#define PIN_FL 99
-#define PIN_L  99
-#define PIN_BL 99
-#define PIN_BR 99
+#define PIN_R  5
+#define PIN_FR 6
+#define PIN_FL 7
+#define PIN_L  8
+#define PIN_BL 9
+#define PIN_BR 10
+
+#define PIN_FR_DIR 24
+#define PIN_FL_DIR
+#define PIN_BL_DIR
+#define PIN_BR_DIR 26
 
 
 // ============================================================================

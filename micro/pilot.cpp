@@ -177,7 +177,7 @@ void Pilot::fly() {
 
         angular_velocity_controller(targetAngVel, gVec, pwmShift);
 
-        throttle = 0;   //throttleTrim + joy.axes[SZ] * (TMAX-TMIN) / 250;
+        throttle = throttleTrim + input_axes[RV] * (TMAX-TMIN);
 
         calculate_pwm_outputs(throttle, pwmShift, pwmOut);
 

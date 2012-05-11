@@ -109,7 +109,7 @@ float currentAngPos[3];  // Current angular position, calculated from DCM.
 // Software configuration: any parameter that is purely code-related or is
 // relatively frequently changed.
 // ============================================================================
-#define MASTER_DT            8000   // 10000 us interval = 100 Hz master loop.
+#define MASTER_DT           10000   // 10000 us interval = 100 Hz master loop.
 #define CONTROL_LOOP_INTERVAL   1   // 1x master = 100 Hz.
 #define ACC_READ_INTERVAL       5   // Read accelerometer every 5th loop.
 #define COMM_LOOP_INTERVAL      1   // 1/5 master = 20 Hz.

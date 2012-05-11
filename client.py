@@ -26,7 +26,12 @@ def starbar(value):
 
 if __name__ == "__main__":
     pygame.init()
-    gamepad = pygame.joystick.Joystick(0)
+
+    if not (pygame.joystick.Joystick(1)):
+        gamepad = pygame.joystick.Joystick(0)
+    else:
+        gamepad = pygame.joystick.Joystick(1)
+
     gamepad.init()
 
     r = rov.Rov(cfg="temp_settings.cfg")
@@ -55,7 +60,8 @@ if __name__ == "__main__":
             for i in r.dcm:
                 print i,
             print
-        time.sleep(0.05)
+
+    time.sleep(0.05)
 
     gamepad.quit()
     pygame.quit()

@@ -13,12 +13,8 @@
 // ============================================================================
 // Variables
 // ============================================================================
-int armCount;   // Arm status counter.
 int loopCount;   // Count system loops.
-int16_t pwmShift[4], pwmOut[4];   // 10 bit PWM output duty cycle.
-int digOut[4];   // Four digital outputs for directional control of Seabotics thrusters.
 float bodyDCM[3][3];   // Current body orientation calculated by IMU.
-float targetAngPos[3], targetAngVel[3], pidAngPos[3], pidAngVel[3], currentAngPos[3];
 float gVec[3];   // This used to be part of ITG3200, but is now global so the PID controller can have direct access to the gyro measurements. This is a hack, and I am a bad programmer.
 float input_axes[4];
 
@@ -33,6 +29,12 @@ struct PIDdata {
     float lastValue;
     float integral;
 } PID[10];
+
+float targetAngPos[3];   // Target angular position.
+float targetAngVel[3];   // Target angular velocity.
+float pidAngPos[3];      // Intermediate PID value for angular position.
+float pidAngVel[3];      // Intermediate PID value for angular velocity.
+float currentAngPos[3];  // Current angular position, calculated from DCM.
 
 #define PID_ANG_POS_X  0
 #define PID_ANG_POS_Y  1
@@ -55,7 +57,7 @@ struct PIDdata {
 #define Z_ANG_VEL_I_GAIN 0.0
 #define Z_ANG_VEL_D_GAIN 0.0
 
-#define TARGET_ANG_POS_CAP PI/12   // Cap maximum angular position.
+#define TARGET_ANG_POS_CAP PI/6   // Cap maximum angular position.
 #define TARGET_ANG_VEL_CAP 2*PI   // Cap maximum angular velocity.
 
 
@@ -126,14 +128,17 @@ struct PIDdata {
 #define TIME_TO_ARM 2000000   // This divided by MASTER_DT determines how long it takes to arm the system.
 #define MOTOR_ARM_THRESHOLD 30   // This is added to TMIN to determine whether or not to arm the system.
 
-// Array indices.
+// 10 bit PWM output duty cycles for each thruster.
+int16_t pwmShift[6], pwmOut[6];
 #define THRUSTER_R  0
-#define THRUSTER_FR 1
-#define THRUSTER_FL 2
-#define THRUSTER_L  3
+#define THRUSTER_L  1
+#define THRUSTER_FR 2
+#define THRUSTER_FL 3
 #define THRUSTER_BL 4
 #define THRUSTER_BR 5
 
+// Four digital outputs for directional control of SeaBotics thrusters.
+int digOut[4];
 #define THRUSTER_FR_DIG 0
 #define THRUSTER_FL_DIG 1
 #define THRUSTER_BL_DIG 2

@@ -40,6 +40,12 @@ int main(void) {
     pinMode(PIN_BL_DIR, OUTPUT);
     pinMode(PIN_BR_DIR, OUTPUT);
 
+    // Initialize CC thrusters safely.
+    pwmDevice[0].writeMicroseconds(TNEUTRAL);
+    pwmDevice[1].writeMicroseconds(TNEUTRAL);
+    digitalWrite(PIN_R_EN, HIGH);
+    digitalWrite(PIN_L_EN, HIGH);
+
     Timer3.initialize(50);
 
     uint64_t nextRunTime = micros();
@@ -59,9 +65,8 @@ int main(void) {
             if (loopCount % CONTROL_LOOP_INTERVAL == 0) {
                 pilot.fly();
 
-                for (int i=0; i<2; i++) {
-                    pwmDevice[i].writeMicroseconds(pwmOut[i]);
-                }
+                pwmDevice[0].writeMicroseconds(pwmOut[THRUSTER_R]);
+                pwmDevice[1].writeMicroseconds(pwmOut[THRUSTER_L]);
                 Timer3.pwm(PIN_FR, pwmOut[THRUSTER_FR]);
                 Timer3.pwm(PIN_FL, pwmOut[THRUSTER_FL]);
                 Timer3.pwm(PIN_BL, pwmOut[THRUSTER_BL]);

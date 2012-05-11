@@ -3,7 +3,7 @@ import ConfigParser
 from time import sleep
 
 class Connection:
-    def __init__(self, device="microcontroller", cfg="settings.cfg", verbose=True):
+    def __init__(self, device="microcontroller", cfg="temp_settings.cfg", verbose=True):
         '''
         Initializes a Connection object using a TCP/IP socket.
         PARAMETERS: Custom values for ip address, port, and timeout.

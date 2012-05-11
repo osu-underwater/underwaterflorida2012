@@ -17,7 +17,7 @@ void EthComm::RX() {
     client = server.available();
 
     if (client.connected()){
-        if(client.available()){
+        while(client.available()){
             myByte = client.read();
             if (myByte == 'a'){
                 pin = client.read() - 1;

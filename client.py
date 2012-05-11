@@ -48,7 +48,7 @@ if __name__ == "__main__":
             for v in r.report():
                 print starbar(v)
             print buttons
-        time.sleep(0.1)
+        time.sleep(0.02)
 
     gamepad.quit()
     pygame.quit()

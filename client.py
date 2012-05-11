@@ -32,15 +32,20 @@ if __name__ == "__main__":
     r.mode_change("default")
     while True:
         pygame.event.pump()
+        buttons = 0x00
+        for i in range(0,8):
+            buttons = buttons | (gamepad.get_button(i) << i)
         parameters = {'xh': gamepad.get_axis(0) * 100, \
                 'yh': gamepad.get_axis(1) * -100, \
                 'xv': gamepad.get_axis(3) * 100, \
-                'yv': gamepad.get_axis(2) * -100}
+                'yv': gamepad.get_axis(2) * -100, \
+                'buttons': buttons}
         r.go(parameters)
         r.command()
         subprocess.call("clear")
         for v in r.report():
             print starbar(v)
+        print buttons
         time.sleep(0.1)
 
     gamepad.quit()

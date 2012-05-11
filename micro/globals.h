@@ -112,8 +112,8 @@ float currentAngPos[3];  // Current angular position, calculated from DCM.
 #define MASTER_DT           10000   // 10000 us interval = 100 Hz master loop.
 #define CONTROL_LOOP_INTERVAL   1   // 1x master = 100 Hz.
 #define ACC_READ_INTERVAL       5   // Read accelerometer every 5th loop.
-#define RX_LOOP_INTERVAL      1   // 1/5 master = 20 Hz.
-#define TX_LOOP_INTERVAL      5   // 1/5 master = 20 Hz.
+#define RX_LOOP_INTERVAL      1   // 1x master = 100 Hz.
+#define TX_LOOP_INTERVAL      2   // 1/2 master = 50 Hz.
 #define DOGLIFE 600   // Watchdog life in milliseconds.
 
 // Throttle stuff. Minimum signal is 750 us. Maximum signal is 2200 us. Hover

@@ -54,6 +54,7 @@ class Connection:
         '''
         if self.connected:
             try:
+                self.sock2micro.setblocking(1)
                 self.sock2micro.send(data)
             except socket.error, e:
                 self.log('%s error sending "%s"' % (e, data))
@@ -67,6 +68,7 @@ class Connection:
         '''
         if self.connected:
             try:
+                self.sock2micro.setblocking(0)
                 received = self.sock2micro.recv(length)
                 return received
             except socket.error, e:
@@ -85,6 +87,7 @@ if __name__ == "__main__":
         conn.connect()
         sleep(0.01);
 
-    conn.send("2")
+    #conn.send("2")
     #data = conn.recv(4)
+    #print data
     conn.close()

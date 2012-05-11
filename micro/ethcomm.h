@@ -22,7 +22,8 @@ class EthComm {
 
 public:
     EthComm();
-    void test();
+    void RX();
+    void TX();
 };
 
 #endif // ETHCOMM_H

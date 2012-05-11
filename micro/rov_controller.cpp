@@ -82,10 +82,17 @@ int main(void) {
             // ================================================================
             // Telemetry loop
             // ================================================================
-            if (loopCount % COMM_LOOP_INTERVAL == 0) {
-                sendTelemetry(nextRunTime);
+            if (loopCount % RX_LOOP_INTERVAL == 0) {
+                //sendTelemetry(nextRunTime);
 
-                eth.test();
+                eth.RX();
+            }
+
+            // ================================================================
+            // Telemetry loop
+            // ================================================================
+            if (loopCount % TX_LOOP_INTERVAL == 0) {
+                eth.TX();
             }
 
             loopCount++;

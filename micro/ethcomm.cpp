@@ -13,7 +13,7 @@ EthComm::EthComm() : server(23) {
     server.begin();
 }
 
-void EthComm::test() {
+void EthComm::RX() {
     client = server.available();
 
     if (client.connected()){
@@ -44,6 +44,16 @@ void EthComm::test() {
         }
     }
     else {
+        client.connect();
+    }
+}
+
+void EthComm::TX() {
+    client = server.available();
+
+    if (client.connected()){
+        client.write('Q');
+    } else {
         client.connect();
     }
 }

@@ -54,17 +54,19 @@ void EthComm::TX() {
     if (client.connected()){
         client.flush();
         client.write('D');
-        for (int i = 0; i < 9; i++){
-            val = bodyDCM[i] * 127 + 127;
-            client.write(val);
+        for (int j = 0; j < 3; j++){
+            for (int i = 0; i < 3; i++){
+                myByte = bodyDCM[j][i] * 127 + 127;
+                client.write(myByte);
+            }
         }
         client.write('P');
-        val = PID[PID_ANG_POS_X].P * 255;
-        client.write(val);
-        val = PID[PID_ANG_VEL_X].P * 255;
-        client.write(val);
-        val = PID[PID_ANG_VEL_X].D * 255;
-        client.write(val);
+        myByte = PID[PID_ANG_POS_X].P * 255;
+        client.write(myByte);
+        myByte = PID[PID_ANG_VEL_X].P * 255;
+        client.write(myByte);
+        myByte = PID[PID_ANG_VEL_X].D * 255;
+        client.write(myByte);
     } else {
         client.connect();
     }

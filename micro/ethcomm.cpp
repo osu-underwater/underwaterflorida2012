@@ -6,11 +6,6 @@
 #include "ethcomm.h"
 
 EthComm::EthComm() : server(23) {
-    uint8_t mac[]     = {0xde, 0xad, 0xbe, 0xef, 0xfe, 0xed};
-    uint8_t ip[]      = {192,169,0,177};
-    uint8_t gateway[] = {192,169,0,1};
-    uint8_t subnet[]  = {255,255,255,0};
-
     server.begin();
     client = server.available();
 

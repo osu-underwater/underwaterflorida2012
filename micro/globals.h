@@ -106,10 +106,10 @@ struct PIDdata {
 // Software configuration: any parameter that is purely code-related or is
 // relatively frequently changed.
 // ============================================================================
-#define MASTER_DT            6000   // 6000 us interval = 166 Hz master loop.
-#define CONTROL_LOOP_INTERVAL   1   // 1x master = 166 Hz.
+#define MASTER_DT           10000   // 10000 us interval = 100 Hz master loop.
+#define CONTROL_LOOP_INTERVAL   1   // 1x master = 100 Hz.
 #define ACC_READ_INTERVAL       5   // Read accelerometer every 5th loop.
-#define COMM_LOOP_INTERVAL      5   // 1/5 master = 33 Hz.
+#define COMM_LOOP_INTERVAL      5   // 1/5 master = 20 Hz.
 #define DOGLIFE 600   // Watchdog life in milliseconds.
 
 // Throttle stuff. Minimum signal is 750 us. Maximum signal is 2200 us. Hover

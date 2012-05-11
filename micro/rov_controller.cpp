@@ -4,7 +4,7 @@
  */
 
 //#include <Wire.h>
-#include "ethcomm.cpp"
+//#include "ethcomm.cpp"
 #include "imu.cpp"
 #include "pilot.cpp"
 #include "telemetry.h"
@@ -17,7 +17,19 @@ int main(void) {
 
     Serial.begin(115200);
 
-    EthComm eth;
+    //EthComm eth;
+    uint8_t mac[]     = {0xde, 0xad, 0xbe, 0xef, 0xfe, 0xed};
+    uint8_t ip[]      = {192,169,0,177};
+    uint8_t gateway[] = {192,169,0,1};
+    uint8_t subnet[]  = {255,255,255,0};
+    Ethernet.begin(mac, ip, gateway, subnet);
+
+    int pin, val;
+    uint8_t myByte;
+    Server server(23);
+    server.begin();
+    Client client = server.available();
+
     Pilot pilot;
 
     IMU imu;
@@ -78,7 +90,35 @@ int main(void) {
             // ================================================================
             if (loopCount % COMM_LOOP_INTERVAL == 0) {
                 sendTelemetry(nextRunTime);
-                eth.test();
+
+                //eth.test();
+                if (client.connected()){
+                    Serial.println("client connected");
+                    if(client.available()){
+                        Serial.println("client available");
+                        myByte = client.read();
+                        if (myByte == 'a'){
+                            pin = client.read() - 1;
+                            val = client.read();
+                            input_axes[pin] = val / 255.0;
+                        } else if (myByte == 'd'){
+                            pin = client.read() - 1;
+                            val = client.read();
+                            if (val == 'H'){
+                                if (input_axes[pin] < 0){
+                                    input_axes[pin] = input_axes[pin] * -1;
+                                }
+                            } else if (val == 'L'){
+                                if (input_axes[pin] > 0){
+                                    input_axes[pin] = input_axes[pin] * -1;
+                                }
+                            }
+                        } else {
+                          Serial.print("Unknown opcode: ");
+                          Serial.println(char(myByte));
+                        }
+                    }
+                }
             }
 
             loopCount++;

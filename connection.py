@@ -1,5 +1,6 @@
 import socket
 import ConfigParser
+from time import sleep
 
 class Connection:
     def __init__(self, device="microcontroller", cfg="settings.cfg", verbose=True):
@@ -82,6 +83,8 @@ if __name__ == "__main__":
     conn = Connection()
     while not conn.connected:
         conn.connect()
+        sleep(0.01);
+
     conn.send("2")
     #data = conn.recv(4)
     conn.close()

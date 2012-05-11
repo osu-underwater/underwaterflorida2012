@@ -122,7 +122,7 @@ void Pilot::fly() {
 
         // ANGULAR POSITION CONTROL FLIGHT MODE
         //if (flightMode == HOVER) {
-        if (true) {
+        if (false) {
             // ====================================================================
             // Calculate target rotation vector based on joystick input scaled to a
             // maximum rotation of PI/6.
@@ -168,16 +168,17 @@ void Pilot::fly() {
 
 
         // ANGULAR VELOCITY CONTROL FLIGHT MODE
-        else if (flightMode == ACRO) {
-            targetAngVel[0] = -joy.axes[SY]/125 * TARGET_ANG_VEL_CAP;
-            targetAngVel[1] =  joy.axes[SX]/125 * TARGET_ANG_VEL_CAP;
-            targetAngVel[2] =  joy.axes[ST]/125 * Z_ROT_SPEED;
+        else if (true) {
+            targetAngVel[0] = -input_axes[LH] * TARGET_ANG_VEL_CAP;
+            targetAngVel[1] =  input_axes[LV] * TARGET_ANG_VEL_CAP;
+            targetAngVel[2] =  input_axes[RH] * Z_ROT_SPEED;
         }
 
 
         angular_velocity_controller(targetAngVel, gVec, pwmShift);
 
-        throttle = throttleTrim + input_axes[RV] * (TMAX-TMIN);
+        //throttle = throttleTrim + input_axes[RV] * (TMAX-TNEUTRAL);
+        throttle = input_axes[RV] * (TMAX-TNEUTRAL);
 
         calculate_pwm_outputs(throttle, pwmShift, pwmOut);
 

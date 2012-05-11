@@ -129,9 +129,9 @@ void Pilot::fly() {
             // TODO: The first two are approximations! Need to figure out how to
             // properly use the DCM.
             // ====================================================================
-            targetAngPos[0] = -input_axes[LH] * TARGET_ANG_POS_CAP;
-            targetAngPos[1] =  input_axes[LV] * TARGET_ANG_POS_CAP;
-            targetAngPos[2] =  currentAngPos[2] + input_axes[RH] * Z_ROT_SPEED;
+            targetAngPos[0] = -input_axes[LV] * TARGET_ANG_POS_CAP;
+            targetAngPos[1] =  input_axes[LH] * TARGET_ANG_POS_CAP;
+            targetAngPos[2] += currentAngPos[2] + input_axes[RH] * Z_ROT_SPEED;
 
             // Keep targetAngPos within [-PI, PI].
             for (int i=0; i<3; i++) {

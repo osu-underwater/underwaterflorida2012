@@ -16,6 +16,8 @@ class Rov:
         self.micro = connection.Connection()
         self.micro.connect()
         self.buttons = 0x00
+        self.dcm = []
+        self.pid = []
 
     def mode_change(self, mode):
         self.mode = mode
@@ -55,8 +57,15 @@ class Rov:
         data = bytearray(data)
         self.micro.send(data)
         data = self.micro.recv(1)
-        if data:
-            print data
+        if data == 'P':
+            data = self.micro.recv(3)
+            if data:
+                self.pid = [float(ord(i)) for i in data]
+                self.pid[2] = self.pid[2] / 100.0
+        elif data == 'D':
+            data = self.micro.recv(9)
+            if data:
+                self.dcm = [ord(i) for i in data]
 
     def __str__(self):
         s = ""

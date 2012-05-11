@@ -49,24 +49,23 @@ void EthComm::RX() {
 }
 
 void EthComm::TX() {
+    uint8_t send_bytes[MAX_SEND_LENGTH];
     client = server.available();
 
     if (client.connected()){
         client.flush();
-        client.write('D');
+        send_bytes[0] = 'D';
         for (int j = 0; j < 3; j++){
             for (int i = 0; i < 3; i++){
-                myByte = bodyDCM[j][i] * 127 + 127;
-                client.write(myByte);
+                send_bytes[j*3 + i + 1] = bodyDCM[j][i] * 127 + 127;
             }
         }
-        client.write('P');
-        myByte = PID[PID_ANG_POS_X].P * 255;
-        client.write(myByte);
-        myByte = PID[PID_ANG_VEL_X].P * 255;
-        client.write(myByte);
-        myByte = PID[PID_ANG_VEL_X].D * 255;
-        client.write(myByte);
+        client.write(send_bytes, 10);
+        send_bytes[0] = 'P';
+        send_bytes[1] = (uint8_t)PID[PID_ANG_POS_X].P;
+        send_bytes[2] = (uint8_t)PID[PID_ANG_VEL_X].P;
+        send_bytes[3] = (uint8_t)(PID[PID_ANG_VEL_X].D * -100.0);
+        client.write(send_bytes, 4);
     } else {
         client.connect();
     }

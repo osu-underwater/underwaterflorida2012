@@ -47,8 +47,15 @@ if __name__ == "__main__":
             print "\n\n\n\n\n"
             for v in r.report():
                 print starbar(v)
-            print buttons
-        time.sleep(0.02)
+            print "Buttons: ", buttons
+            print "PID: ",
+            for i in r.pid:
+                print i,
+            print "\nDCM: ",
+            for i in r.dcm:
+                print i,
+            print
+        time.sleep(0.05)
 
     gamepad.quit()
     pygame.quit()

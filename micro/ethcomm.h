@@ -8,6 +8,8 @@
 
 #include "globals.h"
 
+#define MAX_SEND_LENGTH 10
+
 uint8_t mac[]     = {0xde, 0xad, 0xbe, 0xef, 0xfe, 0xed};
 uint8_t ip[]      = {192,169,0,177};
 uint8_t gateway[] = {192,169,0,1};

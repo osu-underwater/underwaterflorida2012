@@ -42,7 +42,7 @@ if __name__ == "__main__":
                 'buttons': buttons}
         r.go(parameters)
         r.command()
-        subprocess.call("clear")
+        print "\n\n\n\n\n"
         for v in r.report():
             print starbar(v)
         print buttons

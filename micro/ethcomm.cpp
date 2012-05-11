@@ -35,6 +35,8 @@ void EthComm::test() {
                         input_axes[pin] = input_axes[pin] * -1;
                     }
                 }
+            } else if (myByte == 'b'){
+                buttons = client.read();
             } else {
               Serial.print("Unknown opcode: ");
               Serial.println(char(myByte));

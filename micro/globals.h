@@ -21,6 +21,7 @@ float bodyDCM[3][3];   // Current body orientation calculated by IMU.
 float targetAngPos[3], targetAngVel[3], pidAngPos[3], pidAngVel[3], currentAngPos[3];
 float gVec[3];   // This used to be part of ITG3200, but is now global so the PID controller can have direct access to the gyro measurements. This is a hack, and I am a bad programmer.
 float input_axes[4];
+uint8_t buttons;
 
 // ============================================================================
 // PID

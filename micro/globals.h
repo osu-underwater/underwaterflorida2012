@@ -114,13 +114,13 @@ struct PIDdata {
 
 // Throttle stuff. Minimum signal is 750 us. Maximum signal is 2200 us. Hover
 // is around 1200 us.
-#define TMIN   1000   // Minimum throttle PWM duty cycle in microseconds.
+#define TMIN   1200   // Minimum throttle PWM duty cycle in microseconds.
 #define TNEUTRAL 1500   // Hover throttle PWM duty cycle in microseconds.
-#define TMAX   2000   // Maximum throttle PWM duty cycle in microseconds.
+#define TMAX   1800   // Maximum throttle PWM duty cycle in microseconds.
 
 // Throttle PWM
-#define SBMIN   200   // Minimum throttle PWM duty cycle out of 1023.
-#define SBMAX   800   // Maximum throttle PWM duty cycle out of 1023.
+#define SBMIN   0   // Minimum throttle PWM duty cycle out of 1023.
+#define SBMAX   460   // Maximum throttle PWM duty cycle out of 1023.
 
 
 #define TIME_TO_ARM 2000000   // This divided by MASTER_DT determines how long it takes to arm the system.
@@ -183,16 +183,18 @@ struct PIDdata {
 #define MAG_Z_MIN -427
 #define MAG_Z_MAX 165
 
-#define PIN_R  5
-#define PIN_FR 6
-#define PIN_FL 7
-#define PIN_L  8
+#define PIN_R  6
+#define PIN_FR 2
+#define PIN_FL 8
+#define PIN_L  7
 #define PIN_BL 9
-#define PIN_BR 10
+#define PIN_BR 3
 
+#define PIN_R_EN 32
+#define PIN_L_EN 34
 #define PIN_FR_DIR 24
-#define PIN_FL_DIR
-#define PIN_BL_DIR
+#define PIN_FL_DIR 28
+#define PIN_BL_DIR 30
 #define PIN_BR_DIR 26
 
 

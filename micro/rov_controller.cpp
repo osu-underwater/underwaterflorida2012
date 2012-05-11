@@ -25,13 +25,22 @@ int main(void) {
 
     Serial.println("Setup complete.");
 
-    Servo pwmDevice[6];
-    pwmDevice[0].attach(THRUSTER_R);
-    pwmDevice[1].attach(THRUSTER_FR);
-    pwmDevice[2].attach(THRUSTER_FL);
-    pwmDevice[3].attach(THRUSTER_L);
-    pwmDevice[4].attach(THRUSTER_BL);
-    pwmDevice[5].attach(THRUSTER_BR);
+    Servo pwmDevice[2];
+    pwmDevice[0].attach(PIN_R);
+    pwmDevice[1].attach(PIN_L);
+    //pwmDevice[1].attach(PIN_FR);
+    //pwmDevice[2].attach(PIN_FL);
+    //pwmDevice[4].attach(PIN_BL);
+    //pwmDevice[5].attach(PIN_BR);
+
+    pinMode(PIN_R_EN, OUTPUT);
+    pinMode(PIN_L_EN, OUTPUT);
+    pinMode(PIN_FR_DIR, OUTPUT);
+    pinMode(PIN_FL_DIR, OUTPUT);
+    pinMode(PIN_BL_DIR, OUTPUT);
+    pinMode(PIN_BR_DIR, OUTPUT);
+
+    Timer3.initialize(50);
 
     uint64_t nextRunTime = micros();
     loopCount = 0;
@@ -50,9 +59,13 @@ int main(void) {
             if (loopCount % CONTROL_LOOP_INTERVAL == 0) {
                 pilot.fly();
 
-                for (int i=0; i<6; i++) {
+                for (int i=0; i<2; i++) {
                     pwmDevice[i].writeMicroseconds(pwmOut[i]);
                 }
+                Timer3.pwm(PIN_FR, pwmOut[THRUSTER_FR]);
+                Timer3.pwm(PIN_FL, pwmOut[THRUSTER_FL]);
+                Timer3.pwm(PIN_BL, pwmOut[THRUSTER_BL]);
+                Timer3.pwm(PIN_BR, pwmOut[THRUSTER_BR]);
             }
 
             // ================================================================

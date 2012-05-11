@@ -17,7 +17,7 @@ int loopCount;   // Count system loops.
 float bodyDCM[3][3];   // Current body orientation calculated by IMU.
 float gVec[3];   // This used to be part of ITG3200, but is now global so the PID controller can have direct access to the gyro measurements. This is a hack, and I am a bad programmer.
 float input_axes[4];
-uint8_t buttons;
+uint8_t buttons;   // Bitfield for 8 buttons.
 
 // ============================================================================
 // PID
@@ -92,11 +92,11 @@ float currentAngPos[3];  // Current angular position, calculated from DCM.
 #define SER_WRITE_BUF_LEN 150   // Number of bytes of serial data in TX buffer.
 #define SER_WRITE_CHUNK_LEN 15   // Number of bytes to send per loop.
 
-#define SEND_ARM_STATUS
-//#define SEND_TARGET_ROTATION
-#define SEND_MOTOR_VALUES
-#define SEND_DCM
-#define SEND_PID_DATA
+//#define SEND_ARM_STATUS
+////#define SEND_TARGET_ROTATION
+//#define SEND_MOTOR_VALUES
+//#define SEND_DCM
+//#define SEND_PID_DATA
 
 #define DCM_SER_TAG 0xfb
 #define ROT_SER_TAG 0xfc
@@ -148,18 +148,15 @@ int digOut[4];
 // ============================================================================
 // Buttons
 // ============================================================================
-#define BUTTON_UNDEFINED            0
-#define BUTTON_RESET_YAW            1
-#define BUTTON_ACRO_MODE            2
-#define BUTTON_DECREASE_TRIM        3
-#define BUTTON_ZERO_INTEGRAL        4
-#define BUTTON_INCREASE_TRIM        5
-#define BUTTON_DECREASE_XY_ANG_POS_P_GAIN   6
-#define BUTTON_INCREASE_XY_ANG_POS_P_GAIN   7
-#define BUTTON_DECREASE_XY_ANG_VEL_P_GAIN   8
-#define BUTTON_INCREASE_XY_ANG_VEL_P_GAIN   9
-#define BUTTON_DECREASE_XY_ANG_VEL_D_GAIN   10
-#define BUTTON_INCREASE_XY_ANG_VEL_D_GAIN   11
+#define BUTTON_INCREASE_XY_ANG_POS_P_GAIN   0
+#define BUTTON_INCREASE_XY_ANG_VEL_P_GAIN   1
+#define BUTTON_DECREASE_XY_ANG_POS_P_GAIN   2
+#define BUTTON_DECREASE_XY_ANG_VEL_P_GAIN   3
+#define BUTTON_RESET_YAW                    4
+#define BUTTON_ACRO_MODE                    5
+#define BUTTON_UNDEFINED                    6
+#define BUTTON_UNDEFINED                    7
+
 
 // ============================================================================
 // Hardware configuration: any parameter that is changed so infrequently that

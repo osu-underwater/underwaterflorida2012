@@ -44,14 +44,14 @@ struct PIDdata {
 #define XY_ANG_POS_P_GAIN   4.0
 #define XY_ANG_POS_I_GAIN   0.0
 #define XY_ANG_POS_D_GAIN  -0.0
-#define XY_ANG_VEL_P_GAIN 14.0
+#define XY_ANG_VEL_P_GAIN 100.0
 #define XY_ANG_VEL_I_GAIN  0.0
 #define XY_ANG_VEL_D_GAIN -0.14
 
 #define Z_ANG_POS_P_GAIN 0.0
 #define Z_ANG_POS_I_GAIN 0.0
 #define Z_ANG_POS_D_GAIN 0.0
-#define Z_ANG_VEL_P_GAIN 0.0
+#define Z_ANG_VEL_P_GAIN 800.0
 #define Z_ANG_VEL_I_GAIN 0.0
 #define Z_ANG_VEL_D_GAIN 0.0
 
@@ -106,10 +106,10 @@ struct PIDdata {
 // Software configuration: any parameter that is purely code-related or is
 // relatively frequently changed.
 // ============================================================================
-#define MASTER_DT           10000   // 10000 us interval = 100 Hz master loop.
+#define MASTER_DT            8000   // 10000 us interval = 100 Hz master loop.
 #define CONTROL_LOOP_INTERVAL   1   // 1x master = 100 Hz.
 #define ACC_READ_INTERVAL       5   // Read accelerometer every 5th loop.
-#define COMM_LOOP_INTERVAL      5   // 1/5 master = 20 Hz.
+#define COMM_LOOP_INTERVAL      1   // 1/5 master = 20 Hz.
 #define DOGLIFE 600   // Watchdog life in milliseconds.
 
 // Throttle stuff. Minimum signal is 750 us. Maximum signal is 2200 us. Hover

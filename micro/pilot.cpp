@@ -169,8 +169,8 @@ void Pilot::fly() {
 
         // ANGULAR VELOCITY CONTROL FLIGHT MODE
         else if (true) {
-            targetAngVel[0] = -input_axes[LH] * TARGET_ANG_VEL_CAP;
-            targetAngVel[1] =  input_axes[LV] * TARGET_ANG_VEL_CAP;
+            targetAngVel[0] = -input_axes[LV] * TARGET_ANG_VEL_CAP;
+            targetAngVel[1] =  input_axes[LH] * TARGET_ANG_VEL_CAP;
             targetAngVel[2] =  input_axes[RH] * Z_ROT_SPEED;
         }
 

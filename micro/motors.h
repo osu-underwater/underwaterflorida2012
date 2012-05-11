@@ -80,19 +80,23 @@ void calculate_pwm_outputs(float pwmThrottle, int16_t* pwmShift, int16_t* pwmOut
         digOut[THRUSTER_FL_DIG] = 1;   // Set forward direction.
         digOut[THRUSTER_BL_DIG] = 0;   // Set reverse direction.
         digOut[THRUSTER_BR_DIG] = 0;   // Set reverse direction.
+
+        pwmOutput[THRUSTER_FR] = SBMIN + pwmShift[0];
+        pwmOutput[THRUSTER_FL] = SBMIN + pwmShift[0];
+        pwmOutput[THRUSTER_BR] = SBMIN + pwmShift[0];
+        pwmOutput[THRUSTER_BR] = SBMIN + pwmShift[0];
     }
     else if (pwmShift[0] < 0) {
         digOut[THRUSTER_FR_DIG] = 0;   // Set reverse direction.
         digOut[THRUSTER_FL_DIG] = 0;   // Set reverse direction.
         digOut[THRUSTER_BL_DIG] = 1;   // Set forward direction.
         digOut[THRUSTER_BR_DIG] = 1;   // Set forward direction.
+
+        pwmOutput[THRUSTER_FR] = SBMIN - pwmShift[0];
+        pwmOutput[THRUSTER_FL] = SBMIN - pwmShift[0];
+        pwmOutput[THRUSTER_BR] = SBMIN - pwmShift[0];
+        pwmOutput[THRUSTER_BR] = SBMIN - pwmShift[0];
     }
-
-    pwmOutput[THRUSTER_FR] = pwmShift[0];
-    pwmOutput[THRUSTER_FL] = pwmShift[0];
-    pwmOutput[THRUSTER_BR] = pwmShift[0];
-    pwmOutput[THRUSTER_BR] = pwmShift[0];
-
 
     // TODO: Offsets and scales.
     //pwmOutput[MOTOR_T] = TMIN + MOTOR_T_OFFSET + MOTOR_T_SCALE * pwmOutput[MOTOR_T];

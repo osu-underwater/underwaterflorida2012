@@ -28,7 +28,6 @@ int main(void) {
     uint8_t myByte;
     Server server(23);
     server.begin();
-    Client client = server.available();
 
     Pilot pilot;
 
@@ -64,6 +63,7 @@ int main(void) {
     loopCount = 0;
 
     while (1) {
+        Client client = server.available();
         if (micros() >= nextRunTime) {
             // ================================================================
             // System loop
@@ -83,6 +83,11 @@ int main(void) {
                 Timer3.pwm(PIN_FL, pwmOut[THRUSTER_FL]);
                 Timer3.pwm(PIN_BL, pwmOut[THRUSTER_BL]);
                 Timer3.pwm(PIN_BR, pwmOut[THRUSTER_BR]);
+
+                digitalWrite(PIN_FR_DIR, digOut[THRUSTER_FR]);
+                digitalWrite(PIN_FL_DIR, digOut[THRUSTER_FL]);
+                digitalWrite(PIN_BL_DIR, digOut[THRUSTER_BL]);
+                digitalWrite(PIN_BR_DIR, digOut[THRUSTER_BR]);
             }
 
             // ================================================================
@@ -93,9 +98,7 @@ int main(void) {
 
                 //eth.test();
                 if (client.connected()){
-                    Serial.println("client connected");
-                    if(client.available()){
-                        Serial.println("client available");
+                    while(client.available()){
                         myByte = client.read();
                         if (myByte == 'a'){
                             pin = client.read() - 1;
@@ -118,6 +121,9 @@ int main(void) {
                           Serial.println(char(myByte));
                         }
                     }
+                }
+                else {
+                    client.connect();
                 }
             }
 

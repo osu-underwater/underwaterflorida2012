@@ -6,13 +6,16 @@
 #include "ethcomm.h"
 
 EthComm::EthComm() : server(23) {
-    server.begin();
-    client = server.available();
-
+    // Start up Ethernet services.
     Ethernet.begin(mac, ip, gateway, subnet);
+
+    // Start the server.
+    server.begin();
 }
 
 void EthComm::test() {
+    client = server.available();
+
     if (client.connected()){
         if(client.available()){
             myByte = client.read();
@@ -37,6 +40,9 @@ void EthComm::test() {
               Serial.println(char(myByte));
             }
         }
+    }
+    else {
+        client.connect();
     }
 }
 

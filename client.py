@@ -9,6 +9,7 @@ TEXT_RED = "\033[91m"
 TEXT_GREEN = "\033[92m"
 TEXT_BLUE = "\033[94m"
 TEXT_END = "\033[0m"
+VERBOSE = True
 
 def starbar(value):
     retval = "[" + (TEXT_GREEN if value > 0 else TEXT_RED)
@@ -42,10 +43,11 @@ if __name__ == "__main__":
                 'buttons': buttons}
         r.go(parameters)
         r.command()
-        print "\n\n\n\n\n"
-        for v in r.report():
-            print starbar(v)
-        print buttons
+        if VERBOSE:
+            print "\n\n\n\n\n"
+            for v in r.report():
+                print starbar(v)
+            print buttons
         time.sleep(0.1)
 
     gamepad.quit()

@@ -70,35 +70,39 @@ Pilot::Pilot() {
 }
 
 void Pilot::listen() {
-    int serCount = Serial.available();
-    for (int h=0; h<MIN(serCount, SER_READ_CHUNK_LEN); h++) {
-        rBuf[rIndex] = Serial.read();
+    //int serCount = Serial.available();
+    //for (int h=0; h<MIN(serCount, SER_READ_CHUNK_LEN); h++) {
+    //    rBuf[rIndex] = Serial.read();
 
-        if (rBuf[rIndex] == SERHEAD) {   // Receive header.
-            hasFood = true;   // Prepare food for watchdog.
-            for (int i=0; i<SER_PACKET_LEN; i++) {
-                uint8_t serVal = rBuf[(SER_READ_BUF_LEN + rIndex - SER_PACKET_LEN + i) % SER_READ_BUF_LEN];
-                if (serVal >= INPUT_MIN && serVal <= INPUT_MAX) {
-                    serInput[i] = serVal;
-                    okayToFly = true;
-                }
-                else {
-                    okayToFly = false;
-                    i = SER_PACKET_LEN;   // Don't run this loop anymore.
-                    // Flush remaining buffer to avoid taking in the wrong values.
-                }
-            }
+    //    if (rBuf[rIndex] == SERHEAD) {   // Receive header.
+    //        hasFood = true;   // Prepare food for watchdog.
+    //        for (int i=0; i<SER_PACKET_LEN; i++) {
+    //            uint8_t serVal = rBuf[(SER_READ_BUF_LEN + rIndex - SER_PACKET_LEN + i) % SER_READ_BUF_LEN];
+    //            if (serVal >= INPUT_MIN && serVal <= INPUT_MAX) {
+    //                serInput[i] = serVal;
+    //                okayToFly = true;
+    //            }
+    //            else {
+    //                okayToFly = false;
+    //                i = SER_PACKET_LEN;   // Don't run this loop anymore.
+    //                // Flush remaining buffer to avoid taking in the wrong values.
+    //            }
+    //        }
 
-            if (okayToFly) {
-                numGoodComm++;
-            }
-            else {
-                numBadComm++;
-            }
-        }
+    //        if (okayToFly) {
+    //            numGoodComm++;
+    //        }
+    //        else {
+    //            numBadComm++;
+    //        }
+    //    }
 
-        rIndex = (rIndex+1) % SER_READ_BUF_LEN;
-    }
+    //    rIndex = (rIndex+1) % SER_READ_BUF_LEN;
+    //}
+
+    update_joystick_input();
+    process_joystick_buttons();
+
     //sp("(");
     //sp(numGoodComm);
     //sp("/");
@@ -116,9 +120,6 @@ void Pilot::fly() {
         //spln("");
         //sp("fly ");
         //spln(micros());
-
-        update_joystick_input();
-        process_joystick_buttons();
 
         // ANGULAR POSITION CONTROL FLIGHT MODE
         if (flightMode == HOVER) {
@@ -202,10 +203,10 @@ void Pilot::update_joystick_input(void) {
     // Shift serial input values [0, 250] to correct range for each axis. Z
     // stays positive for ease of calculation.
     // ========================================================================
-    joy.axes[SX] = (float) serInput[SX] - 125;   // [-125, 125]
-    joy.axes[SY] = (float) serInput[SY] - 125;   // [-125, 125]
-    joy.axes[ST] = (float) serInput[ST] - 125;   // [-125, 125]
-    joy.axes[SZ] = (float) serInput[SZ];         // [   0, 250]
+    //joy.axes[SX] = (float) serInput[SX] - 125;   // [-125, 125]
+    //joy.axes[SY] = (float) serInput[SY] - 125;   // [-125, 125]
+    //joy.axes[ST] = (float) serInput[ST] - 125;   // [-125, 125]
+    //joy.axes[SZ] = (float) serInput[SZ];         // [   0, 250]
 
     // ========================================================================
     // Set button values. We utilize only the lower 7 bits, since doing

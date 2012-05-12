@@ -45,8 +45,8 @@ if __name__ == "__main__":
                 'lv': gamepad.get_axis(1) * -100, \
                 'rh': gamepad.get_axis(3) * 100, \
                 'rv': gamepad.get_axis(2) * -100, \
-                'dh': gamepad.get_hat(0)[0] * 100, \
-                'dv': gamepad.get_hat(0)[1] * 100, \
+                'dh': gamepad.get_axis(4) * 100, \
+                'dv': gamepad.get_axis(5) * 100, \
                 'buttons': buttons}
         r.go(parameters)
         r.command()
@@ -62,7 +62,7 @@ if __name__ == "__main__":
             for i in r.dcm:
                 print i,
             print
-        time.sleep(0.05)
+        time.sleep(0.04)
 
 
     gamepad.quit()

@@ -72,8 +72,8 @@ void calculate_pwm_outputs(float pwmThrottle, int16_t* pwmShift, int16_t* pwmOut
     // corresponding arm is heavier.
     // TODO: The last term for each pwmOutput is INACCURATE. Fix this.
     // ====================================================================
-    pwmOutput[THRUSTER_R] = TNEUTRAL + pwmThrottle + pwmShift[2];
-    pwmOutput[THRUSTER_L] = TNEUTRAL + pwmThrottle - pwmShift[2];
+    pwmOutput[THRUSTER_R] = TNEUTRAL + pwmThrottle - input_axes[2]*200;
+    pwmOutput[THRUSTER_L] = TNEUTRAL + pwmThrottle + input_axes[2]*200;
 
     if (pwmShift[0] > 0) {
         digOut[THRUSTER_FR_DIG] = 1;   // Set forward direction.
@@ -104,47 +104,47 @@ void calculate_pwm_outputs(float pwmThrottle, int16_t* pwmShift, int16_t* pwmOut
     //pwmOutput[MOTOR_L] = TMIN + MOTOR_L_OFFSET + MOTOR_L_SCALE * pwmOutput[MOTOR_L];
 
 
-    int mapUpper, mapLower;
+    //int mapUpper, mapLower;
 
-    // Cap PWM values for CrustCrawler thrusters.
-    mapUpper = pwmOutput[THRUSTER_R] > pwmOutput[THRUSTER_L] ? pwmOutput[THRUSTER_R] : pwmOutput[THRUSTER_L];
-    mapUpper = mapUpper > TMAX ? mapUpper : TMAX;
+    //// Cap PWM values for CrustCrawler thrusters.
+    //mapUpper = pwmOutput[THRUSTER_R] > pwmOutput[THRUSTER_L] ? pwmOutput[THRUSTER_R] : pwmOutput[THRUSTER_L];
+    //mapUpper = mapUpper > TMAX ? mapUpper : TMAX;
 
-    mapLower = pwmOutput[THRUSTER_R] < pwmOutput[THRUSTER_L] ? pwmOutput[THRUSTER_R] : pwmOutput[THRUSTER_L];
-    mapLower = mapLower < TMAX ? mapLower : TMAX;
+    //mapLower = pwmOutput[THRUSTER_R] < pwmOutput[THRUSTER_L] ? pwmOutput[THRUSTER_R] : pwmOutput[THRUSTER_L];
+    //mapLower = mapLower < TMAX ? mapLower : TMAX;
 
-    if (mapUpper > mapLower) {
-        pwmOutput[THRUSTER_R] = map(pwmOutput[THRUSTER_R], mapLower, mapUpper, TMIN, TMAX);
-        pwmOutput[THRUSTER_L] = map(pwmOutput[THRUSTER_L], mapLower, mapUpper, TMIN, TMAX);
-    }
-    else {
-        pwmOutput[THRUSTER_R] = TNEUTRAL;
-        pwmOutput[THRUSTER_L] = TNEUTRAL;
-    }
+    //if (mapUpper > mapLower) {
+    //    pwmOutput[THRUSTER_R] = map(pwmOutput[THRUSTER_R], mapLower, mapUpper, TMIN, TMAX);
+    //    pwmOutput[THRUSTER_L] = map(pwmOutput[THRUSTER_L], mapLower, mapUpper, TMIN, TMAX);
+    //}
+    //else {
+    //    pwmOutput[THRUSTER_R] = TNEUTRAL;
+    //    pwmOutput[THRUSTER_L] = TNEUTRAL;
+    //}
 
-    // Cap PWM values for SeaBotics thrusters.
-    mapUpper = pwmOutput[THRUSTER_FR] > pwmOutput[THRUSTER_FL] ? pwmOutput[THRUSTER_FR] : pwmOutput[THRUSTER_FL];
-    mapUpper = mapUpper > pwmOutput[THRUSTER_BL] ? mapUpper : pwmOutput[THRUSTER_BL];
-    mapUpper = mapUpper > pwmOutput[THRUSTER_BR] ? mapUpper : pwmOutput[THRUSTER_BR];
-    mapUpper = mapUpper > SBMAX ? mapUpper : SBMAX;
+    //// Cap PWM values for SeaBotics thrusters.
+    //mapUpper = pwmOutput[THRUSTER_FR] > pwmOutput[THRUSTER_FL] ? pwmOutput[THRUSTER_FR] : pwmOutput[THRUSTER_FL];
+    //mapUpper = mapUpper > pwmOutput[THRUSTER_BL] ? mapUpper : pwmOutput[THRUSTER_BL];
+    //mapUpper = mapUpper > pwmOutput[THRUSTER_BR] ? mapUpper : pwmOutput[THRUSTER_BR];
+    //mapUpper = mapUpper > SBMAX ? mapUpper : SBMAX;
 
-    mapLower = pwmOutput[THRUSTER_FR] < pwmOutput[THRUSTER_FL] ? pwmOutput[THRUSTER_FR] : pwmOutput[THRUSTER_FL];
-    mapLower = mapLower < pwmOutput[THRUSTER_BL] ? mapLower : pwmOutput[THRUSTER_BL];
-    mapLower = mapLower < pwmOutput[THRUSTER_BR] ? mapLower : pwmOutput[THRUSTER_BR];
-    mapLower = mapLower < SBMAX ? mapLower : SBMAX;
+    //mapLower = pwmOutput[THRUSTER_FR] < pwmOutput[THRUSTER_FL] ? pwmOutput[THRUSTER_FR] : pwmOutput[THRUSTER_FL];
+    //mapLower = mapLower < pwmOutput[THRUSTER_BL] ? mapLower : pwmOutput[THRUSTER_BL];
+    //mapLower = mapLower < pwmOutput[THRUSTER_BR] ? mapLower : pwmOutput[THRUSTER_BR];
+    //mapLower = mapLower < SBMAX ? mapLower : SBMAX;
 
-    if (mapUpper > mapLower) {
-        pwmOutput[THRUSTER_FR] = map(pwmOutput[THRUSTER_FR], mapLower, mapUpper, SBMIN, SBMAX);
-        pwmOutput[THRUSTER_FL] = map(pwmOutput[THRUSTER_FL], mapLower, mapUpper, SBMIN, SBMAX);
-        pwmOutput[THRUSTER_BL] = map(pwmOutput[THRUSTER_BL], mapLower, mapUpper, SBMIN, SBMAX);
-        pwmOutput[THRUSTER_BR] = map(pwmOutput[THRUSTER_BR], mapLower, mapUpper, SBMIN, SBMAX);
-    }
-    else {
-        pwmOutput[THRUSTER_FR] = SBMIN;
-        pwmOutput[THRUSTER_FL] = SBMIN;
-        pwmOutput[THRUSTER_BL] = SBMIN;
-        pwmOutput[THRUSTER_BR] = SBMIN;
-    }
+    //if (mapUpper > mapLower) {
+    //    pwmOutput[THRUSTER_FR] = map(pwmOutput[THRUSTER_FR], mapLower, mapUpper, SBMIN, SBMAX);
+    //    pwmOutput[THRUSTER_FL] = map(pwmOutput[THRUSTER_FL], mapLower, mapUpper, SBMIN, SBMAX);
+    //    pwmOutput[THRUSTER_BL] = map(pwmOutput[THRUSTER_BL], mapLower, mapUpper, SBMIN, SBMAX);
+    //    pwmOutput[THRUSTER_BR] = map(pwmOutput[THRUSTER_BR], mapLower, mapUpper, SBMIN, SBMAX);
+    //}
+    //else {
+    //    pwmOutput[THRUSTER_FR] = SBMIN;
+    //    pwmOutput[THRUSTER_FL] = SBMIN;
+    //    pwmOutput[THRUSTER_BL] = SBMIN;
+    //    pwmOutput[THRUSTER_BR] = SBMIN;
+    //}
 }
 
 #endif // MOTORS_H

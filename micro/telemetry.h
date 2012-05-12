@@ -11,7 +11,6 @@
 #include "globals.h"
 
 void sendTelemetry(int nextRuntime) {
-    spln(input_axes[0]);
     // ========================================================================
     // Report target rotation vector (in BODY frame). TODO: targetRot is a
     // misleading name because this is dwB (delta omega BODY), so to speak

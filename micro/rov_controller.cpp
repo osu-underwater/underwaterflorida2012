@@ -85,8 +85,12 @@ int main(void) {
             if (loopCount % COMM_LOOP_INTERVAL == 0) {
                 eth.RX();
             }
+            else if (loopCount % COMM_LOOP_INTERVAL == 1) {
+                pilot.listen();
+            }
             else {
-                eth.TX();
+                //eth.TX();
+                sendTelemetry(nextRunTime);
             }
 
             loopCount++;

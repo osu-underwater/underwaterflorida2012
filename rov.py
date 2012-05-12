@@ -56,7 +56,7 @@ class Rov:
         data += ['b', self.buttons]
         data = bytearray(data)
         self.micro.send(data)
-        data = self.micro.recv(1)
+        #data = self.micro.recv(1)
         if data == 'P':
             data = self.micro.recv(3)
             if data:

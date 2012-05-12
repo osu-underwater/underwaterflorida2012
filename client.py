@@ -27,7 +27,7 @@ def starbar(value):
 if __name__ == "__main__":
     pygame.init()
 
-    if not (pygame.joystick.Joystick(1)):
+    if pygame.joystick.get_count() == 1:
         gamepad = pygame.joystick.Joystick(0)
     else:
         gamepad = pygame.joystick.Joystick(1)
@@ -41,10 +41,12 @@ if __name__ == "__main__":
         buttons = 0x00
         for i in range(0,8):
             buttons = buttons | (gamepad.get_button(i) << i)
-        parameters = {'xh': gamepad.get_axis(0) * 100, \
-                'yh': gamepad.get_axis(1) * -100, \
-                'xv': gamepad.get_axis(3) * 100, \
-                'yv': gamepad.get_axis(2) * -100, \
+        parameters = {'lh': gamepad.get_axis(0) * 100, \
+                'lv': gamepad.get_axis(1) * -100, \
+                'rh': gamepad.get_axis(3) * 100, \
+                'rv': gamepad.get_axis(2) * -100, \
+                'dh': gamepad.get_hat(0)[0], \
+                'dv': gamepad.get_hat(0)[1], \
                 'buttons': buttons}
         r.go(parameters)
         r.command()
@@ -60,8 +62,8 @@ if __name__ == "__main__":
             for i in r.dcm:
                 print i,
             print
+        time.sleep(0.05)
 
-    time.sleep(0.05)
 
     gamepad.quit()
     pygame.quit()

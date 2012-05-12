@@ -45,8 +45,8 @@ if __name__ == "__main__":
                 'lv': gamepad.get_axis(1) * -100, \
                 'rh': gamepad.get_axis(3) * 100, \
                 'rv': gamepad.get_axis(2) * -100, \
-                'dh': gamepad.get_hat(0)[0], \
-                'dv': gamepad.get_hat(0)[1], \
+                'dh': gamepad.get_hat(0)[0] * 100, \
+                'dv': gamepad.get_hat(0)[1] * 100, \
                 'buttons': buttons}
         r.go(parameters)
         r.command()

@@ -7,6 +7,7 @@
 #include "SoftwareSerial.cpp"
 #include "Sprite.cpp"
 #include "Stepper.cpp"
+#include "TimerOne.cpp"
 #include "TimerThree.cpp"
 #include "Wire.cpp"
 

@@ -72,6 +72,7 @@ ARDUINO_LIBS2 = \
 -I$(INSTALL_DIR)/libraries/Sprite/utility \
 -I$(INSTALL_DIR)/libraries/Stepper \
 -I$(INSTALL_DIR)/libraries/Stepper/utility \
+-I$(INSTALL_DIR)/libraries/Timer1 \
 -I$(INSTALL_DIR)/libraries/Timer3 \
 -I$(INSTALL_DIR)/libraries/Wire \
 -I$(INSTALL_DIR)/libraries/Wire/utility

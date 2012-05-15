@@ -47,14 +47,14 @@ float currentAngPos[3];  // Current angular position, calculated from DCM.
 #define XY_ANG_POS_P_GAIN   4.0
 #define XY_ANG_POS_I_GAIN   0.0
 #define XY_ANG_POS_D_GAIN  -0.0
-#define XY_ANG_VEL_P_GAIN 100.0
+#define XY_ANG_VEL_P_GAIN  30.0
 #define XY_ANG_VEL_I_GAIN  0.0
 #define XY_ANG_VEL_D_GAIN -0.14
 
 #define Z_ANG_POS_P_GAIN 0.0
 #define Z_ANG_POS_I_GAIN 0.0
 #define Z_ANG_POS_D_GAIN 0.0
-#define Z_ANG_VEL_P_GAIN 800.0
+#define Z_ANG_VEL_P_GAIN 500.0
 #define Z_ANG_VEL_I_GAIN 0.0
 #define Z_ANG_VEL_D_GAIN 0.0
 

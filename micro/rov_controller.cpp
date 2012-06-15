@@ -15,7 +15,7 @@ int main(void) {
     // Begin Arduino services.
     Wire.begin();
 
-    Serial.begin(115200);
+    //Serial.begin(115200);
 
     EthComm eth;
 
@@ -24,7 +24,7 @@ int main(void) {
     IMU imu;
     imu.init();
 
-    Serial.println("Setup complete.");
+    //Serial.println("Setup complete.");
 
     Servo pwmDevice[2];
     pwmDevice[0].attach(PIN_R);
@@ -47,6 +47,10 @@ int main(void) {
     digitalWrite(PIN_R_EN, HIGH);
     digitalWrite(PIN_L_EN, HIGH);
 
+    pinMode(12, OUTPUT);
+    pinMode(13, OUTPUT);
+
+    Timer1.initialize(50);
     Timer3.initialize(50);
 
     uint64_t nextRunTime = micros();
@@ -54,10 +58,11 @@ int main(void) {
 
     while (1) {
         if (micros() >= nextRunTime) {
+            digitalWrite(12, HIGH);
             // ================================================================
             // System loop
             // ================================================================
-            imu.update();   // Run this ASAP when loop starts so gyro integration is as accurate as possible.
+            //imu.update();   // Run this ASAP when loop starts so gyro integration is as accurate as possible.
             nextRunTime += MASTER_DT;   // Update next loop start time.
 
             // ================================================================
@@ -69,14 +74,14 @@ int main(void) {
                 pwmDevice[0].writeMicroseconds(pwmOut[THRUSTER_R]);
                 pwmDevice[1].writeMicroseconds(pwmOut[THRUSTER_L]);
                 Timer3.pwm(PIN_FR, pwmOut[THRUSTER_FR]);
-                Timer3.pwm(PIN_FL, pwmOut[THRUSTER_FL]);
-                Timer3.pwm(PIN_BL, pwmOut[THRUSTER_BL]);
+                Timer1.pwm(PIN_FL, pwmOut[THRUSTER_FL]);
+                Timer1.pwm(PIN_BL, pwmOut[THRUSTER_BL]);
                 Timer3.pwm(PIN_BR, pwmOut[THRUSTER_BR]);
 
-                digitalWrite(PIN_FR_DIR, digOut[THRUSTER_FR]);
-                digitalWrite(PIN_FL_DIR, digOut[THRUSTER_FL]);
-                digitalWrite(PIN_BL_DIR, digOut[THRUSTER_BL]);
-                digitalWrite(PIN_BR_DIR, digOut[THRUSTER_BR]);
+                digitalWrite(PIN_FR_DIR, digOut[THRUSTER_FR_DIG]);
+                digitalWrite(PIN_FL_DIR, digOut[THRUSTER_FL_DIG]);
+                digitalWrite(PIN_BL_DIR, digOut[THRUSTER_BL_DIG]);
+                digitalWrite(PIN_BR_DIR, digOut[THRUSTER_BR_DIG]);
             }
 
             // ================================================================
@@ -89,13 +94,15 @@ int main(void) {
                 pilot.listen();
             }
             else {
-                //eth.TX();
-                sendTelemetry(nextRunTime);
+                eth.TX();
+                //sendTelemetry(nextRunTime);
             }
 
             loopCount++;
             loopCount = loopCount % 1000;
         }
+
+        digitalWrite(12, LOW);
     }
 
     return 0;

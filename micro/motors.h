@@ -15,7 +15,7 @@
 // inputs.
 void angular_position_controller (float* desired_pos, float* current_pos, float* desired_vel) {
     // Cap desired_pos.
-    for (int i=0; i<3; i++) {
+    for (int i=0; i<2; i++) {
         if (desired_pos[i] > TARGET_ANG_POS_CAP) {
             desired_pos[i] = TARGET_ANG_POS_CAP;
         }
@@ -66,19 +66,11 @@ void angular_velocity_controller (float* desired_vel, float* current_vel, int16_
 void calculate_pwm_outputs(float pwmThrottle, int16_t* pwmShift, int16_t* pwmOutput) {
     // ====================================================================
     // Calculate motor/servo values.
-    //     MOTOR_X_OFFSET: Offset starting motor values to account for
-    //                     chassis imbalance.
-    //     MOTOR_X_SCALE: Scale targetRot.
-    //     joy.axes[SZ]: Throttle.
-    //
-    // TODO: MOTOR_X_SCALE should be replaced by actual PID gains. Besides,
-    // it's incorrect to scale in the negative direction if the
-    // corresponding arm is heavier.
-    // TODO: The last term for each pwmOutput is INACCURATE. Fix this.
     // ====================================================================
-    pwmOutput[THRUSTER_R] = TNEUTRAL + pwmThrottle - input_axes[2]*50;
-    pwmOutput[THRUSTER_L] = TNEUTRAL + pwmThrottle + input_axes[2]*50;
+    pwmOutput[THRUSTER_R] = TNEUTRAL + pwmThrottle - pwmShift[2];
+    pwmOutput[THRUSTER_L] = TNEUTRAL + pwmThrottle + pwmShift[2];
 
+    // TODO: input_axes[5] controls vertical movement of ROV. This is a hack!
     pwmOutput[THRUSTER_FR] = SBMIN + pwmShift[0]*10 - input_axes[5]*100;
     pwmOutput[THRUSTER_FL] = SBMIN + pwmShift[0]*10 - input_axes[5]*100;
     pwmOutput[THRUSTER_BL] = SBMIN - pwmShift[0]*10 - input_axes[5]*100;
@@ -93,11 +85,6 @@ void calculate_pwm_outputs(float pwmThrottle, int16_t* pwmShift, int16_t* pwmOut
     pwmOutput[THRUSTER_FL] = ABS(pwmOutput[THRUSTER_FL]);
     pwmOutput[THRUSTER_BL] = ABS(pwmOutput[THRUSTER_BL]);
     pwmOutput[THRUSTER_BR] = ABS(pwmOutput[THRUSTER_BR]);
-
-    // TODO: Offsets and scales.
-    //pwmOutput[MOTOR_T] = TMIN + MOTOR_T_OFFSET + MOTOR_T_SCALE * pwmOutput[MOTOR_T];
-    //pwmOutput[MOTOR_R] = TMIN + MOTOR_R_OFFSET + MOTOR_R_SCALE * pwmOutput[MOTOR_R];
-    //pwmOutput[MOTOR_L] = TMIN + MOTOR_L_OFFSET + MOTOR_L_SCALE * pwmOutput[MOTOR_L];
 
 
     int mapUpper, mapLower;

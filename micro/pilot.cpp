@@ -126,7 +126,7 @@ void Pilot::fly() {
         // ====================================================================
         targetAngPos[0] = -input_axes[LV] * TARGET_ANG_POS_CAP;
         targetAngPos[1] =  input_axes[LH] * TARGET_ANG_POS_CAP;
-        targetAngPos[2] += currentAngPos[2] + input_axes[RH] * Z_ROT_SPEED;
+        targetAngPos[2] += input_axes[RH] * Z_ROT_SPEED * CONTROL_LOOP_INTERVAL * MASTER_DT / 1000000;
 
         // Keep targetAngPos within [-PI, PI].
         for (int i=0; i<3; i++) {
@@ -172,7 +172,7 @@ void Pilot::fly() {
     angular_velocity_controller(targetAngVel, gVec, pwmShift);
 
     //throttle = throttleTrim + input_axes[RV] * (TMAX-TNEUTRAL);
-    float throttle = input_axes[RV] * (TMAX-TNEUTRAL)/4;
+    float throttle = input_axes[RV] * (TMAX-TNEUTRAL);
 
     calculate_pwm_outputs(throttle, pwmShift, pwmOut);
 }
@@ -212,7 +212,7 @@ void Pilot::process_joystick_buttons(void) {
     // "Reset" targetAngPos[2] to currentAngPos[2] if thumb button is pressed.
     if (joy.buttons[BUTTON_RESET_YAW]) {
         targetAngPos[2] = currentAngPos[2];
-        targetAngPos[2] -= input_axes[RH] * Z_ROT_SPEED;
+        targetAngPos[2] += input_axes[RH] * Z_ROT_SPEED;
     }
 
     // Enable acro mode (velocity control).

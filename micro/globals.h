@@ -187,11 +187,11 @@ int digOut[4];
 #define MAG_Z_MAX 165
 
 #define PIN_R  6
-#define PIN_FR 2
-#define PIN_FL 8
 #define PIN_L  7
-#define PIN_BL 9
-#define PIN_BR 3
+#define PIN_FR 2    // Timer 3
+#define PIN_FL 11   // Timer 1
+#define PIN_BL 12   // Timer 1
+#define PIN_BR 3    // Timer 3
 
 #define PIN_R_EN 32
 #define PIN_L_EN 34

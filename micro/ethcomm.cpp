@@ -38,13 +38,15 @@ void EthComm::RX() {
             } else if (myByte == 'b'){
                 buttons = client.read();
             } else {
-              Serial.print("Unknown opcode: ");
-              Serial.println(char(myByte));
+              //Serial.print("Unknown opcode: ");
+              //Serial.println(char(myByte));
             }
         }
+        digitalWrite(13, HIGH);
     }
     else {
         client.connect();
+        digitalWrite(13, LOW);
     }
 }
 

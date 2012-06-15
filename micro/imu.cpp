@@ -33,8 +33,10 @@ void IMU::init() {
 
     // Set initial DCM as the identity matrix.
     for (int i=0; i<3; i++)
-        for (int j=0; j<3; j++)
+        for (int j=0; j<3; j++) {
             gyroDCM[i][j] = (i==j) ? 1.0 : 0.0;
+            bodyDCM[i][j] = (i==j) ? 1.0 : 0.0;
+        }
 
     /*! Calculate DCM offset.
      *

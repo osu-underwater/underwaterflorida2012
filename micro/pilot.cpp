@@ -115,75 +115,66 @@ void Pilot::listen() {
 }
 
 void Pilot::fly() {
-    //if (okayToFly) {
-    if (true) {
-        //spln("");
-        //sp("fly ");
-        //spln(micros());
+    // ANGULAR POSITION CONTROL FLIGHT MODE
+    if (flightMode == HOVER) {
+        // ====================================================================
+        // Calculate target rotation vector based on joystick input scaled to a
+        // maximum rotation of PI/6.
+        //
+        // TODO: The first two are approximations! Need to figure out how to
+        // properly use the DCM.
+        // ====================================================================
+        targetAngPos[0] = -input_axes[LV] * TARGET_ANG_POS_CAP;
+        targetAngPos[1] =  input_axes[LH] * TARGET_ANG_POS_CAP;
+        targetAngPos[2] += currentAngPos[2] + input_axes[RH] * Z_ROT_SPEED;
 
-        // ANGULAR POSITION CONTROL FLIGHT MODE
-        if (flightMode == HOVER) {
-            // ====================================================================
-            // Calculate target rotation vector based on joystick input scaled to a
-            // maximum rotation of PI/6.
-            //
-            // TODO: The first two are approximations! Need to figure out how to
-            // properly use the DCM.
-            // ====================================================================
-            targetAngPos[0] = -input_axes[LV] * TARGET_ANG_POS_CAP;
-            targetAngPos[1] =  input_axes[LH] * TARGET_ANG_POS_CAP;
-            targetAngPos[2] += currentAngPos[2] + input_axes[RH] * Z_ROT_SPEED;
-
-            // Keep targetAngPos within [-PI, PI].
-            for (int i=0; i<3; i++) {
-                if (targetAngPos[i] > PI) {
-                    targetAngPos[i] -= 2*PI;
-                }
-                else if (targetAngPos[i] < -PI) {
-                    targetAngPos[i] += 2*PI;
-                }
+        // Keep targetAngPos within [-PI, PI].
+        for (int i=0; i<3; i++) {
+            if (targetAngPos[i] > PI) {
+                targetAngPos[i] -= 2*PI;
             }
-
-            // ====================================================================
-            // Calculate current rotation vector (Euler angles) from DCM and make
-            // appropriate modifications to make PID calculations work later.
-            // ====================================================================
-            currentAngPos[0] = bodyDCM[1][2];
-            currentAngPos[1] = -bodyDCM[0][2];
-            currentAngPos[2] = atan2(bodyDCM[0][1], bodyDCM[0][0]);
-
-            // Keep abs(targetAngPos[i] - currentAngPos[i]) within [-PI, PI]. This way,
-            // nothing bad happens as we rotate to any angle in [-PI, PI].
-            for (int i=0; i<3; i++) {
-                if (targetAngPos[i] - currentAngPos[i] > PI) {
-                    currentAngPos[i] += 2*PI;
-                }
-                else if (targetAngPos[i] - currentAngPos[i] < -PI) {
-                    currentAngPos[i] -= 2*PI;
-                }
+            else if (targetAngPos[i] < -PI) {
+                targetAngPos[i] += 2*PI;
             }
-
-            angular_position_controller(targetAngPos, currentAngPos, targetAngVel);
         }
 
+        // ====================================================================
+        // Calculate current rotation vector (Euler angles) from DCM and make
+        // appropriate modifications to make PID calculations work later.
+        // ====================================================================
+        currentAngPos[0] = bodyDCM[1][2];
+        currentAngPos[1] = -bodyDCM[0][2];
+        currentAngPos[2] = atan2(bodyDCM[0][1], bodyDCM[0][0]);
 
-        // ANGULAR VELOCITY CONTROL FLIGHT MODE
-        else if (flightMode == ACRO) {
-            targetAngVel[0] = -input_axes[LV] * TARGET_ANG_VEL_CAP;
-            targetAngVel[1] =  input_axes[LH] * TARGET_ANG_VEL_CAP;
-            targetAngVel[2] =  input_axes[RH] * Z_ROT_SPEED;
+        // Keep abs(targetAngPos[i] - currentAngPos[i]) within [-PI, PI]. This way,
+        // nothing bad happens as we rotate to any angle in [-PI, PI].
+        for (int i=0; i<3; i++) {
+            if (targetAngPos[i] - currentAngPos[i] > PI) {
+                currentAngPos[i] += 2*PI;
+            }
+            else if (targetAngPos[i] - currentAngPos[i] < -PI) {
+                currentAngPos[i] -= 2*PI;
+            }
         }
 
-
-        angular_velocity_controller(targetAngVel, gVec, pwmShift);
-
-        //throttle = throttleTrim + input_axes[RV] * (TMAX-TNEUTRAL);
-        throttle = input_axes[RV] * (TMAX-TNEUTRAL);
-
-        calculate_pwm_outputs(throttle, pwmShift, pwmOut);
-
-        okayToFly = false;
+        angular_position_controller(targetAngPos, currentAngPos, targetAngVel);
     }
+
+
+    // ANGULAR VELOCITY CONTROL FLIGHT MODE
+    else if (flightMode == ACRO) {
+        targetAngVel[0] = -input_axes[LV] * TARGET_ANG_VEL_CAP;
+        targetAngVel[1] =  input_axes[LH] * TARGET_ANG_VEL_CAP;
+        targetAngVel[2] =  input_axes[RH] * Z_ROT_SPEED;
+    }
+
+
+    angular_velocity_controller(targetAngVel, gVec, pwmShift);
+
+    //throttle = throttleTrim + input_axes[RV] * (TMAX-TNEUTRAL);
+    float throttle = input_axes[RV] * (TMAX-TNEUTRAL)/4;
+
+    calculate_pwm_outputs(throttle, pwmShift, pwmOut);
 }
 
 void Pilot::die() {
